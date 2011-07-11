@@ -17,6 +17,8 @@ setup(
     long_description=read('README.rst'),
     test_suite='nose.collector',
     setup_requires=['nose'],
+    tests_require=['django'],
+    install_requires=['python-statsd'],
     classifiers=[
         'License :: OSI Approved :: BSD License',
     ],
