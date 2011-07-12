@@ -1,8 +1,10 @@
 import os
 from setuptools import setup
 
-def read(fname):
-    return open(os.path.join(os.path.dirname(__file__), fname)).read()
+if os.path.isfile('README.rst'):
+    long_description = open('README.rst').read()
+else:
+    long_description = 'See http://pypi.python.org/pypi/django-statsd/'
 
 setup(
     name = 'django-statsd',
@@ -14,11 +16,11 @@ setup(
     url='https://github.com/WoLpH/django-statsd',
     license = 'BSD',
     packages=['django_statsd'],
-    long_description=read('README.rst'),
+    long_description=long_description,
     test_suite='nose.collector',
     setup_requires=['nose'],
     tests_require=['django'],
-    install_requires=['python-statsd'],
+    install_requires=['python-statsd>=1.2'],
     classifiers=[
         'License :: OSI Approved :: BSD License',
     ],
