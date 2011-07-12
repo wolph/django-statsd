@@ -87,11 +87,9 @@ class TimingMiddleware(object):
         # (e.g. django.contrib.auth.views.login)
         self.view_name = view_func.__module__ + '.' + view_func.__name__
 
-        # Time the response
-        with request.timings('view'):
-            response = view_func(request, *view_args, **view_kwargs)
-
-        return response
+        ## Time the response
+        #with request.timings('view'):
+        #    response = view_func(request, *view_args, **view_kwargs)
 
     def process_response(self, request, response):
         if getattr(self.scope, 'timings', None):
