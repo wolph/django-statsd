@@ -65,6 +65,9 @@ class TimingMiddleware(object):
 
     scope = threading.local()
 
+    def __init__(self):
+        self.scope.timings = None
+
     def process_request(self, request):
 
         # store the timings in the request so it can be used everywhere
@@ -91,9 +94,13 @@ class TimingMiddleware(object):
         return response
 
     def process_response(self, request, response):
-        request.timings.stop('total')
-        if self.view_name:
-            request.timings.submit(request.method.lower(), self.view_name)
+        if getattr(self.scope, 'timings', None):
+            self.scope.timings.stop('total')
+            if self.view_name:
+                self.scope.timings.submit(
+                    request.method.lower(),
+                    self.view_name,
+                )
 
         self.cleanup(request)
 
