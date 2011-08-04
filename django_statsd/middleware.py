@@ -36,8 +36,8 @@ class Timer(object):
         self.starts[key] = time.time()
 
     def stop(self, key):
-        assert (key in self.starts,
-                'Unable to stop tracking %s, never started tracking it' % key)
+        assert key in self.starts, ('Unable to stop tracking %s, never '
+            'started tracking it' % key)
 
         delta = time.time() - self.starts.pop(key)
         self.totals[key] = self.totals.get(key, 0.0) + delta
@@ -52,10 +52,8 @@ class Timer(object):
             timer.send(k, self.totals.pop(k))
 
         if settings.DEBUG:
-            assert (
-                not self.starts,
-                'Timer(s) %r were started but never stopped' % self.starts,
-            )
+            assert not self.starts, ('Timer(s) %r were started but never '
+                'stopped' % self.starts)
 
     def __call__(self, key):
         return WithTimer(self, key)
@@ -122,15 +120,15 @@ class DummyWith(object):
 
 
 def start(key):
-    if hasattr(TimingMiddleware.scope, 'timings'):
+    if getattr(TimingMiddleware.scope, 'timings', None):
         TimingMiddleware.scope.timings.start(key)
 
 def stop(key):
-    if hasattr(TimingMiddleware.scope, 'timings'):
+    if getattr(TimingMiddleware.scope, 'timings', None):
         return TimingMiddleware.scope.timings.stop(key)
 
 def with_(key):
-    if hasattr(TimingMiddleware.scope, 'timings'):
+    if getattr(TimingMiddleware.scope, 'timings', None):
         return TimingMiddleware.scope.timings(key)
     else:
         return DummyWith()
