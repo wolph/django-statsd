@@ -112,12 +112,26 @@ class TimingMiddleware(object):
         self.view_name = None
         request.timings = None
 
+
+class DummyWith(object):
+    def __enter__(self):
+        pass
+
+    def __exit__(self, type_, value, traceback):
+        pass
+
+
 def start(key):
-    TimingMiddleware.scope.timings.start(key)
+    if hasattr(TimingMiddleware.scope, 'timings'):
+        TimingMiddleware.scope.timings.start(key)
 
 def stop(key):
-    return TimingMiddleware.scope.timings.stop(key)
+    if hasattr(TimingMiddleware.scope, 'timings'):
+        return TimingMiddleware.scope.timings.stop(key)
 
 def with_(key):
-    return TimingMiddleware.scope.timings(key)
+    if hasattr(TimingMiddleware.scope, 'timings'):
+        return TimingMiddleware.scope.timings(key)
+    else:
+        return DummyWith()
 

@@ -8,7 +8,7 @@ else:
 
 setup(
     name = 'django-statsd',
-    version = '1.2',
+    version = '1.3',
     author = 'Rick van Hattem',
     author_email = 'Rick.van.Hattem@Fawo.nl',
     description = '''django-statsd is a django app that submits query and 
