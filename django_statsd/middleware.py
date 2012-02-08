@@ -27,7 +27,8 @@ class WithTimer(object):
 
 class Timer(object):
 
-    def __init__(self):
+    def __init__(self, prefix='view'):
+        self.prefix = prefix
         self.starts = {}
         self.totals = {}
 
@@ -43,8 +44,8 @@ class Timer(object):
         self.totals[key] = self.totals.get(key, 0.0) + delta
         return delta
 
-    def submit(self, request_method, view_name):
-        prefix = 'view.%s.%s' % (request_method, view_name)
+    def submit(self, *args):
+        prefix = '%s.%s' % (self.prefix, '.'.join(args))
 
         timer = utils.get_timer(prefix)
 
@@ -66,11 +67,15 @@ class TimingMiddleware(object):
     def __init__(self):
         self.scope.timings = None
 
-    def process_request(self, request):
+    @classmethod
+    def start(cls, prefix='view'):
+        cls.scope.timings = Timer(prefix)
+        cls.scope.timings.start('total')
+        return cls.scope
 
+    def process_request(self, request):
         # store the timings in the request so it can be used everywhere
-        self.scope.timings = request.timings = Timer()
-        request.timings.start('total')
+        request.timings = self.start()
         self.view_name = None
 
     def process_view(
@@ -89,14 +94,18 @@ class TimingMiddleware(object):
         #with request.timings('view'):
         #    response = view_func(request, *view_args, **view_kwargs)
 
+    @classmethod
+    def stop(cls, *key):
+        if getattr(cls.scope, 'timings', None):
+            cls.scope.timings.stop('total')
+            cls.scope.timings.submit(*key)
+
     def process_response(self, request, response):
-        if getattr(self.scope, 'timings', None):
-            self.scope.timings.stop('total')
-            if self.view_name:
-                self.scope.timings.submit(
-                    request.method.lower(),
-                    self.view_name,
-                )
+        if self.view_name:
+            self.stop(
+                request.method.lower(),
+                self.view_name,
+            )
 
         self.cleanup(request)
 
