@@ -1,9 +1,13 @@
 from __future__ import with_statement
 import time
-from django_statsd import utils
 import logging
+import functools
 import threading
+
 from django.conf import settings
+
+from django_statsd import utils
+
 logger = logging.getLogger(__name__)
 
 
@@ -101,9 +105,13 @@ class TimingMiddleware(object):
             cls.scope.timings.submit(*key)
 
     def process_response(self, request, response):
+        method = request.method.lower()
+        if request.is_ajax():
+            method += '_ajax'
+
         if self.view_name:
             self.stop(
-                request.method.lower(),
+                method,
                 self.view_name,
             )
 
@@ -141,4 +149,14 @@ def with_(key):
         return TimingMiddleware.scope.timings(key)
     else:
         return DummyWith()
+
+def wrapper(prefix, f):
+    @functools.wraps(f)
+    def _wrapper(*args, **kwargs):
+        with with_('prefix.%s' % (prefix, f.__name__.lower())):
+            return f(*args, **kwargs)
+    return _wrapper
+
+def decorator(prefix):
+    return lambda f: wrapper(prefix, f)
 
