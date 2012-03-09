@@ -109,7 +109,7 @@ class TimingMiddleware(object):
         if request.is_ajax():
             method += '_ajax'
 
-        if self.view_name:
+        if getattr(self, 'view_name', None):
             self.stop(
                 method,
                 self.view_name,
