@@ -1,0 +1,302 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>django_statsd &mdash; Django Statsd v1.7 documentation</title>
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '#',
+        VERSION:     '1.7',
+        COLLAPSE_MODINDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="Django Statsd v1.7 documentation" href="index.html" />
+    <link rel="prev" title="Introduction" href="usage.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="modindex.html" title="Global Module Index"
+             accesskey="M">modules</a> |</li>
+        <li class="right" >
+          <a href="usage.html" title="Introduction"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">Django Statsd v1.7 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="module-django_statsd.celery">
+<h1>django_statsd<a class="headerlink" href="#module-django_statsd.celery" title="Permalink to this headline">¶</a></h1>
+<dl class="function">
+<dt id="django_statsd.start">
+<tt class="descclassname">django_statsd.</tt><tt class="descname">start</tt><big>(</big><em>key</em><big>)</big><a class="headerlink" href="#django_statsd.start" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="django_statsd.stop">
+<tt class="descclassname">django_statsd.</tt><tt class="descname">stop</tt><big>(</big><em>key</em><big>)</big><a class="headerlink" href="#django_statsd.stop" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="django_statsd.with_">
+<tt class="descclassname">django_statsd.</tt><tt class="descname">with_</tt><big>(</big><em>key</em><big>)</big><a class="headerlink" href="#django_statsd.with_" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="django_statsd.wrapper">
+<tt class="descclassname">django_statsd.</tt><tt class="descname">wrapper</tt><big>(</big><em>prefix</em>, <em>f</em><big>)</big><a class="headerlink" href="#django_statsd.wrapper" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="django_statsd.decorator">
+<tt class="descclassname">django_statsd.</tt><tt class="descname">decorator</tt><big>(</big><em>prefix</em><big>)</big><a class="headerlink" href="#django_statsd.decorator" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="class">
+<dt id="django_statsd.middleware.Client">
+<em class="property">class </em><tt class="descclassname">django_statsd.middleware.</tt><tt class="descname">Client</tt><big>(</big><em>prefix='view'</em><big>)</big><a class="headerlink" href="#django_statsd.middleware.Client" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="attribute">
+<dt id="django_statsd.middleware.Client.class_">
+<tt class="descname">class_</tt><a class="headerlink" href="#django_statsd.middleware.Client.class_" title="Permalink to this definition">¶</a></dt>
+<dd>alias of <a title="django_statsd.middleware.Client" class="reference internal" href="#django_statsd.middleware.Client"><tt class="xref docutils literal"><span class="pre">Client</span></tt></a></dd></dl>
+
+<dl class="method">
+<dt id="django_statsd.middleware.Client.get_client">
+<tt class="descname">get_client</tt><big>(</big><em>*args</em><big>)</big><a class="headerlink" href="#django_statsd.middleware.Client.get_client" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="django_statsd.middleware.Client.submit">
+<tt class="descname">submit</tt><big>(</big><em>*args</em><big>)</big><a class="headerlink" href="#django_statsd.middleware.Client.submit" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="django_statsd.middleware.Counter">
+<em class="property">class </em><tt class="descclassname">django_statsd.middleware.</tt><tt class="descname">Counter</tt><big>(</big><em>prefix='view'</em><big>)</big><a class="headerlink" href="#django_statsd.middleware.Counter" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="attribute">
+<dt id="django_statsd.middleware.Counter.class_">
+<tt class="descname">class_</tt><a class="headerlink" href="#django_statsd.middleware.Counter.class_" title="Permalink to this definition">¶</a></dt>
+<dd>alias of <a title="django_statsd.middleware.Counter" class="reference internal" href="#django_statsd.middleware.Counter"><tt class="xref docutils literal"><span class="pre">Counter</span></tt></a></dd></dl>
+
+<dl class="method">
+<dt id="django_statsd.middleware.Counter.decrement">
+<tt class="descname">decrement</tt><big>(</big><em>key</em>, <em>delta=1</em><big>)</big><a class="headerlink" href="#django_statsd.middleware.Counter.decrement" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="django_statsd.middleware.Counter.increment">
+<tt class="descname">increment</tt><big>(</big><em>key</em>, <em>delta=1</em><big>)</big><a class="headerlink" href="#django_statsd.middleware.Counter.increment" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="django_statsd.middleware.Counter.submit">
+<tt class="descname">submit</tt><big>(</big><em>*args</em><big>)</big><a class="headerlink" href="#django_statsd.middleware.Counter.submit" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="django_statsd.middleware.DummyWith">
+<em class="property">class </em><tt class="descclassname">django_statsd.middleware.</tt><tt class="descname">DummyWith</tt><a class="headerlink" href="#django_statsd.middleware.DummyWith" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="class">
+<dt id="django_statsd.middleware.StatsdMiddleware">
+<em class="property">class </em><tt class="descclassname">django_statsd.middleware.</tt><tt class="descname">StatsdMiddleware</tt><a class="headerlink" href="#django_statsd.middleware.StatsdMiddleware" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="method">
+<dt id="django_statsd.middleware.StatsdMiddleware.cleanup">
+<tt class="descname">cleanup</tt><big>(</big><em>request</em><big>)</big><a class="headerlink" href="#django_statsd.middleware.StatsdMiddleware.cleanup" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="django_statsd.middleware.StatsdMiddleware.process_exception">
+<tt class="descname">process_exception</tt><big>(</big><em>request</em>, <em>exception</em><big>)</big><a class="headerlink" href="#django_statsd.middleware.StatsdMiddleware.process_exception" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="django_statsd.middleware.StatsdMiddleware.process_request">
+<tt class="descname">process_request</tt><big>(</big><em>request</em><big>)</big><a class="headerlink" href="#django_statsd.middleware.StatsdMiddleware.process_request" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="django_statsd.middleware.StatsdMiddleware.process_response">
+<tt class="descname">process_response</tt><big>(</big><em>request</em>, <em>response</em><big>)</big><a class="headerlink" href="#django_statsd.middleware.StatsdMiddleware.process_response" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="django_statsd.middleware.StatsdMiddleware.process_view">
+<tt class="descname">process_view</tt><big>(</big><em>request</em>, <em>view_func</em>, <em>view_args</em>, <em>view_kwargs</em><big>)</big><a class="headerlink" href="#django_statsd.middleware.StatsdMiddleware.process_view" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="classmethod">
+<dt id="django_statsd.middleware.StatsdMiddleware.start">
+<em class="property">classmethod </em><tt class="descname">start</tt><big>(</big><em>prefix='view'</em><big>)</big><a class="headerlink" href="#django_statsd.middleware.StatsdMiddleware.start" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="classmethod">
+<dt id="django_statsd.middleware.StatsdMiddleware.stop">
+<em class="property">classmethod </em><tt class="descname">stop</tt><big>(</big><em>*key</em><big>)</big><a class="headerlink" href="#django_statsd.middleware.StatsdMiddleware.stop" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="django_statsd.middleware.Timer">
+<em class="property">class </em><tt class="descclassname">django_statsd.middleware.</tt><tt class="descname">Timer</tt><big>(</big><em>prefix='view'</em><big>)</big><a class="headerlink" href="#django_statsd.middleware.Timer" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="attribute">
+<dt id="django_statsd.middleware.Timer.class_">
+<tt class="descname">class_</tt><a class="headerlink" href="#django_statsd.middleware.Timer.class_" title="Permalink to this definition">¶</a></dt>
+<dd>alias of <a title="django_statsd.middleware.Timer" class="reference internal" href="#django_statsd.middleware.Timer"><tt class="xref docutils literal"><span class="pre">Timer</span></tt></a></dd></dl>
+
+<dl class="method">
+<dt id="django_statsd.middleware.Timer.start">
+<tt class="descname">start</tt><big>(</big><em>key</em><big>)</big><a class="headerlink" href="#django_statsd.middleware.Timer.start" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="django_statsd.middleware.Timer.stop">
+<tt class="descname">stop</tt><big>(</big><em>key</em><big>)</big><a class="headerlink" href="#django_statsd.middleware.Timer.stop" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="django_statsd.middleware.Timer.submit">
+<tt class="descname">submit</tt><big>(</big><em>*args</em><big>)</big><a class="headerlink" href="#django_statsd.middleware.Timer.submit" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="django_statsd.middleware.TimingMiddleware">
+<em class="property">class </em><tt class="descclassname">django_statsd.middleware.</tt><tt class="descname">TimingMiddleware</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#django_statsd.middleware.TimingMiddleware" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="classmethod">
+<dt id="django_statsd.middleware.TimingMiddleware.deprecated">
+<em class="property">classmethod </em><tt class="descname">deprecated</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#django_statsd.middleware.TimingMiddleware.deprecated" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="django_statsd.middleware.WithTimer">
+<em class="property">class </em><tt class="descclassname">django_statsd.middleware.</tt><tt class="descname">WithTimer</tt><big>(</big><em>timer</em>, <em>key</em><big>)</big><a class="headerlink" href="#django_statsd.middleware.WithTimer" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="django_statsd.middleware.decorator">
+<tt class="descclassname">django_statsd.middleware.</tt><tt class="descname">decorator</tt><big>(</big><em>prefix</em><big>)</big><a class="headerlink" href="#django_statsd.middleware.decorator" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="django_statsd.middleware.decr">
+<tt class="descclassname">django_statsd.middleware.</tt><tt class="descname">decr</tt><big>(</big><em>key</em>, <em>value=1</em><big>)</big><a class="headerlink" href="#django_statsd.middleware.decr" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="django_statsd.middleware.incr">
+<tt class="descclassname">django_statsd.middleware.</tt><tt class="descname">incr</tt><big>(</big><em>key</em>, <em>value=1</em><big>)</big><a class="headerlink" href="#django_statsd.middleware.incr" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="django_statsd.middleware.start">
+<tt class="descclassname">django_statsd.middleware.</tt><tt class="descname">start</tt><big>(</big><em>key</em><big>)</big><a class="headerlink" href="#django_statsd.middleware.start" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="django_statsd.middleware.stop">
+<tt class="descclassname">django_statsd.middleware.</tt><tt class="descname">stop</tt><big>(</big><em>key</em><big>)</big><a class="headerlink" href="#django_statsd.middleware.stop" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="django_statsd.middleware.with_">
+<tt class="descclassname">django_statsd.middleware.</tt><tt class="descname">with_</tt><big>(</big><em>key</em><big>)</big><a class="headerlink" href="#django_statsd.middleware.with_" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="django_statsd.middleware.wrapper">
+<tt class="descclassname">django_statsd.middleware.</tt><tt class="descname">wrapper</tt><big>(</big><em>prefix</em>, <em>f</em><big>)</big><a class="headerlink" href="#django_statsd.middleware.wrapper" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="class">
+<dt id="django_statsd.redis.StatsdRedis">
+<em class="property">class </em><tt class="descclassname">django_statsd.redis.</tt><tt class="descname">StatsdRedis</tt><big>(</big><em>host='localhost'</em>, <em>port=6379</em>, <em>db=0</em>, <em>password=None</em>, <em>socket_timeout=None</em>, <em>connection_pool=None</em>, <em>charset='utf-8'</em>, <em>errors='strict'</em><big>)</big><a class="headerlink" href="#django_statsd.redis.StatsdRedis" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="method">
+<dt id="django_statsd.redis.StatsdRedis.execute_command">
+<tt class="descname">execute_command</tt><big>(</big><em>func_name</em>, <em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#django_statsd.redis.StatsdRedis.execute_command" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <h4>Previous topic</h4>
+            <p class="topless"><a href="usage.html"
+                                  title="previous chapter">Introduction</a></p>
+            <h3>This Page</h3>
+            <ul class="this-page-menu">
+              <li><a href="_sources/django_statsd.txt"
+                     rel="nofollow">Show Source</a></li>
+            </ul>
+          <div id="searchbox" style="display: none">
+            <h3>Quick search</h3>
+              <form class="search" action="search.html" method="get">
+                <input type="text" name="q" size="18" />
+                <input type="submit" value="Go" />
+                <input type="hidden" name="check_keywords" value="yes" />
+                <input type="hidden" name="area" value="default" />
+              </form>
+              <p class="searchtip" style="font-size: 90%">
+              Enter search terms or a module, class or function name.
+              </p>
+          </div>
+          <script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="modindex.html" title="Global Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="usage.html" title="Introduction"
+             >previous</a> |</li>
+        <li><a href="index.html">Django Statsd v1.7 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+      &copy; Copyright 2012, Rick van Hattem.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.5.
+    </div>
+  </body>
+</html>

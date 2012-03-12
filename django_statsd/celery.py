@@ -19,5 +19,5 @@ try:
     task_failure.connect(clear)
 
 except ImportError:
-    raise
+    pass
 
