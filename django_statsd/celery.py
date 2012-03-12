@@ -5,14 +5,14 @@ try:
     from celery.signals import task_prerun, task_postrun, task_failure
 
     def start(**kwargs):
-        middleware.TimingMiddleware.start('celery')
+        middleware.StatsdMiddleware.start('celery')
 
     def stop(**kwargs):
-        middleware.TimingMiddleware.stop(kwargs.get('task').name)
-        middleware.TimingMiddleware.scope.timings = None
+        middleware.StatsdMiddleware.stop(kwargs.get('task').name)
+        middleware.StatsdMiddleware.scope.timings = None
 
     def clear(**kwargs):
-        middleware.TimingMiddleware.scope.timings = None
+        middleware.StatsdMiddleware.scope.timings = None
 
     task_prerun.connect(start)
     task_postrun.connect(stop)

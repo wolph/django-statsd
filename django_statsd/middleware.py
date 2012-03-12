@@ -3,6 +3,9 @@ import time
 import logging
 import functools
 import threading
+import warnings
+import collections
+import statsd
 
 from django.conf import settings
 
@@ -29,12 +32,43 @@ class WithTimer(object):
         self.timer.stop(self.key)
 
 
-class Timer(object):
+class Client(object):
+    class_ = statsd.Client
 
     def __init__(self, prefix='view'):
         self.prefix = prefix
+        self.data = collections.defaultdict(int)
+
+    def get_client(self, *args):
+        prefix = '%s.%s' % (self.prefix, '.'.join(args))
+        return utils.get_client(prefix, class_=self.class_)
+
+    def submit(self, *args):
+        raise NotImplementedError(
+            'Subclasses must define a `submit` function')
+
+class Counter(Client):
+    class_ = statsd.Counter
+
+    def increment(self, key, delta=1):
+        self.data[key] += delta
+
+    def decrement(self, key, delta=1):
+        self.data[key] -= delta
+
+    def submit(self, *args):
+        client = self.get_client(*args)
+        for k, v in self.data:
+            if v:
+                client.increment(k, v)
+
+class Timer(Client):
+    class_ = statsd.Timer
+
+    def __init__(self, prefix='view'):
+        Client.__init__(self, prefix)
         self.starts = {}
-        self.totals = {}
+        self.data = collections.defaultdict(float)
 
     def start(self, key):
         assert key not in self.starts, 'Already started tracking %s' % key
@@ -45,16 +79,13 @@ class Timer(object):
             'started tracking it' % key)
 
         delta = time.time() - self.starts.pop(key)
-        self.totals[key] = self.totals.get(key, 0.0) + delta
+        self.data[key] += delta
         return delta
 
     def submit(self, *args):
-        prefix = '%s.%s' % (self.prefix, '.'.join(args))
-
-        timer = utils.get_timer(prefix)
-
-        for k in self.totals.keys():
-            timer.send(k, self.totals.pop(k))
+        client = self.get_client(*args)
+        for k in self.data.keys():
+            client.send(k, self.data.pop(k))
 
         if settings.DEBUG:
             assert not self.starts, ('Timer(s) %r were started but never '
@@ -64,22 +95,24 @@ class Timer(object):
         return WithTimer(self, key)
 
 
-class TimingMiddleware(object):
+class StatsdMiddleware(object):
 
     scope = threading.local()
 
     def __init__(self):
         self.scope.timings = None
+        self.scope.counter = None
 
     @classmethod
     def start(cls, prefix='view'):
         cls.scope.timings = Timer(prefix)
         cls.scope.timings.start('total')
+        cls.scope.counter = Counter(prefix)
         return cls.scope
 
     def process_request(self, request):
         # store the timings in the request so it can be used everywhere
-        request.timings = self.start()
+        request.statsd = self.start()
         self.view_name = None
 
     def process_view(
@@ -94,15 +127,12 @@ class TimingMiddleware(object):
         # (e.g. django.contrib.auth.views.login)
         self.view_name = view_func.__module__ + '.' + view_func.__name__
 
-        ## Time the response
-        #with request.timings('view'):
-        #    response = view_func(request, *view_args, **view_kwargs)
-
     @classmethod
     def stop(cls, *key):
         if getattr(cls.scope, 'timings', None):
             cls.scope.timings.stop('total')
             cls.scope.timings.submit(*key)
+            cls.scope.counter.submit(*key)
 
     def process_response(self, request, response):
         method = request.method.lower()
@@ -124,8 +154,21 @@ class TimingMiddleware(object):
 
     def cleanup(self, request):
         self.scope.timings = None
+        self.scope.counter = None
         self.view_name = None
-        request.timings = None
+        request.statsd = None
+
+
+class TimingMiddleware(StatsdMiddleware):
+    @classmethod
+    def deprecated(cls, *args, **kwargs):
+        warnings.warn(
+            'The `TimingMiddleware` has been deprecated in favour of '
+            'the `StatsdMiddleware`. Please update your middleware settings',
+            DeprecationWarning
+        )
+
+    __init__ = deprecated
 
 
 class DummyWith(object):
@@ -137,18 +180,26 @@ class DummyWith(object):
 
 
 def start(key):
-    if getattr(TimingMiddleware.scope, 'timings', None):
-        TimingMiddleware.scope.timings.start(key)
+    if getattr(StatsdMiddleware.scope, 'timings', None):
+        StatsdMiddleware.scope.timings.start(key)
 
 def stop(key):
-    if getattr(TimingMiddleware.scope, 'timings', None):
-        return TimingMiddleware.scope.timings.stop(key)
+    if getattr(StatsdMiddleware.scope, 'timings', None):
+        return StatsdMiddleware.scope.timings.stop(key)
 
 def with_(key):
-    if getattr(TimingMiddleware.scope, 'timings', None):
-        return TimingMiddleware.scope.timings(key)
+    if getattr(StatsdMiddleware.scope, 'timings', None):
+        return StatsdMiddleware.scope.timings(key)
     else:
         return DummyWith()
+
+def incr(key, value=1):
+    if getattr(StatsdMiddleware.scope, 'counter', None):
+        StatsdMiddleware.scope.counter.incr(key, value)
+
+def decr(key, value=1):
+    if getattr(StatsdMiddleware.scope, 'counter', None):
+        StatsdMiddleware.scope.counter.decr(key, value)
 
 def wrapper(prefix, f):
     @functools.wraps(f)
