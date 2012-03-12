@@ -204,7 +204,7 @@ def decr(key, value=1):
 def wrapper(prefix, f):
     @functools.wraps(f)
     def _wrapper(*args, **kwargs):
-        with with_('prefix.%s' % (prefix, f.__name__.lower())):
+        with with_('%s.%s' % (prefix, f.__name__.lower())):
             return f(*args, **kwargs)
     return _wrapper
 
