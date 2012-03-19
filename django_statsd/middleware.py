@@ -14,6 +14,9 @@ from django_statsd import utils
 logger = logging.getLogger(__name__)
 
 
+TRACK_MIDDLEWARE = getattr(settings, 'STATSD_TRACK_MIDDLEWARE', False)
+
+
 class WithTimer(object):
 
     def __init__(self, timer, key):
@@ -94,6 +97,18 @@ class Timer(Client):
     def __call__(self, key):
         return WithTimer(self, key)
 
+class StatsdMiddlewareTimer(object):
+    def process_response(self, request, response):
+        StatsdMiddleware.scope.timings.start('process_response')
+        return response
+
+    def process_request(self, request):
+        StatsdMiddleware.scope.timings.stop('process_request')
+
+    def process_view(self, request, view_func, view_args, view_kwargs):
+        StatsdMiddleware.scope.timings.stop('process_view')
+
+
 
 class StatsdMiddleware(object):
 
@@ -113,6 +128,8 @@ class StatsdMiddleware(object):
     def process_request(self, request):
         # store the timings in the request so it can be used everywhere
         request.statsd = self.start()
+        if TRACK_MIDDLEWARE:
+            self.scope.timings.start('process_request')
         self.view_name = None
 
     def process_view(
@@ -122,6 +139,8 @@ class StatsdMiddleware(object):
             view_args,
             view_kwargs,
         ):
+        if TRACK_MIDDLEWARE:
+            StatsdMiddleware.scope.timings.start('process_view')
 
         # View name is defined as module.view
         # (e.g. django.contrib.auth.views.login)
@@ -135,6 +154,8 @@ class StatsdMiddleware(object):
             cls.scope.counter.submit(*key)
 
     def process_response(self, request, response):
+        if TRACK_MIDDLEWARE:
+            StatsdMiddleware.scope.timings.stop('process_response')
         method = request.method.lower()
         if request.is_ajax():
             method += '_ajax'
