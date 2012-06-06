@@ -229,6 +229,13 @@ def wrapper(prefix, f):
             return f(*args, **kwargs)
     return _wrapper
 
+def named_wrapper(name, f):
+    @functools.wraps(f)
+    def _wrapper(*args, **kwargs):
+        with with_(name):
+            return f(*args, **kwargs)
+    return _wrapper
+
 def decorator(prefix):
     return lambda f: wrapper(prefix, f)
 
