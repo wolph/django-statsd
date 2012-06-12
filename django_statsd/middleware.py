@@ -70,18 +70,21 @@ class Timer(Client):
 
     def __init__(self, prefix='view'):
         Client.__init__(self, prefix)
-        self.starts = {}
+        self.starts = collections.defaultdict(collections.deque)
         self.data = collections.defaultdict(float)
 
     def start(self, key):
-        assert key not in self.starts, 'Already started tracking %s' % key
-        self.starts[key] = time.time()
+        self.starts[key].append(time.time())
 
     def stop(self, key):
-        assert key in self.starts, ('Unable to stop tracking %s, never '
+        assert self.starts[key], ('Unable to stop tracking %s, never '
             'started tracking it' % key)
 
-        delta = time.time() - self.starts.pop(key)
+        delta = time.time() - self.starts[key].pop()
+        # Clean up when we're done
+        if not self.starts[key]:
+            del self.starts[key]
+
         self.data[key] += delta
         return delta
 
