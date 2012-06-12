@@ -6,7 +6,7 @@ from django_statsd.middleware import (
     named_wrapper,
     decorator,
 )
-from django_statsd import redis, celery, json, templates, urls
+from django_statsd import redis, celery, json, templates
 
 __all__ = [
     'start',
@@ -19,6 +19,6 @@ __all__ = [
     'redis',
     'celery',
     'templates',
-    'urls',
+    #'urls',
 ]
 
