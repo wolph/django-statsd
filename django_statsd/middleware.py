@@ -147,7 +147,11 @@ class StatsdMiddleware(object):
 
         # View name is defined as module.view
         # (e.g. django.contrib.auth.views.login)
-        self.view_name = view_func.__module__ + '.' + view_func.__name__
+        self.view_name = view_func.__module__
+
+        # CBV specific
+        if hasattr(view_func, '__name__'):
+            self.view_name = self.view_name + '.' + view_func.__name__
 
     @classmethod
     def stop(cls, *key):
