@@ -61,7 +61,7 @@ class Counter(Client):
 
     def submit(self, *args):
         client = self.get_client(*args)
-        for k, v in self.data:
+        for k, v in self.data.items():
             if v:
                 client.increment(k, v)
 
