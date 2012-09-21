@@ -127,7 +127,7 @@ class StatsdMiddleware(object):
         cls.scope.timings.start('total')
         cls.scope.counter = Counter(prefix)
         cls.scope.counter.increment('hit')
-        cls.scope.counter_site = Counter(prefix + '.site')
+        cls.scope.counter_site = Counter(prefix)
         cls.scope.counter_site.increment('hit')
         return cls.scope
 
@@ -164,7 +164,7 @@ class StatsdMiddleware(object):
             cls.scope.timings.stop('total')
             cls.scope.timings.submit(*key)
             cls.scope.counter.submit(*key)
-            cls.scope.counter_site.submit()
+            cls.scope.counter_site.submit('site')
 
     def process_response(self, request, response):
         if TRACK_MIDDLEWARE:
