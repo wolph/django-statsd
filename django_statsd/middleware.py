@@ -61,7 +61,7 @@ class Counter(Client):
 
     def submit(self, *args):
         client = self.get_client(*args)
-        for k, v in self.data:
+        for k, v in self.data.items():
             if v:
                 client.increment(k, v)
 
@@ -126,6 +126,9 @@ class StatsdMiddleware(object):
         cls.scope.timings = Timer(prefix)
         cls.scope.timings.start('total')
         cls.scope.counter = Counter(prefix)
+        cls.scope.counter.increment('hit')
+        cls.scope.counter_site = Counter(prefix)
+        cls.scope.counter_site.increment('hit')
         return cls.scope
 
     def process_request(self, request):
@@ -161,6 +164,7 @@ class StatsdMiddleware(object):
             cls.scope.timings.stop('total')
             cls.scope.timings.submit(*key)
             cls.scope.counter.submit(*key)
+            cls.scope.counter_site.submit('site')
 
     def process_response(self, request, response):
         if TRACK_MIDDLEWARE:
@@ -225,11 +229,11 @@ def with_(key):
 
 def incr(key, value=1):
     if getattr(StatsdMiddleware.scope, 'counter', None):
-        StatsdMiddleware.scope.counter.incr(key, value)
+        StatsdMiddleware.scope.counter.increment(key, value)
 
 def decr(key, value=1):
     if getattr(StatsdMiddleware.scope, 'counter', None):
-        StatsdMiddleware.scope.counter.decr(key, value)
+        StatsdMiddleware.scope.counter.decrement(key, value)
 
 def wrapper(prefix, f):
     @functools.wraps(f)
