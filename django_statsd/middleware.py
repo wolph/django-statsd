@@ -225,11 +225,11 @@ def with_(key):
 
 def incr(key, value=1):
     if getattr(StatsdMiddleware.scope, 'counter', None):
-        StatsdMiddleware.scope.counter.incr(key, value)
+        StatsdMiddleware.scope.counter.increment(key, value)
 
 def decr(key, value=1):
     if getattr(StatsdMiddleware.scope, 'counter', None):
-        StatsdMiddleware.scope.counter.decr(key, value)
+        StatsdMiddleware.scope.counter.decrement(key, value)
 
 def wrapper(prefix, f):
     @functools.wraps(f)
