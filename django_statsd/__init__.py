@@ -1,4 +1,6 @@
 from django_statsd.middleware import (
+    decr,
+    incr,
     start,
     stop,
     with_,
@@ -9,6 +11,8 @@ from django_statsd.middleware import (
 from django_statsd import redis, celery, json, templates
 
 __all__ = [
+    'decr',
+    'incr',
     'start',
     'stop',
     'with_',
