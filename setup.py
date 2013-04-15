@@ -19,8 +19,8 @@ setup(
     packages=['django_statsd'],
     long_description=long_description,
     test_suite='nose.collector',
+    tests_require=['django', 'mock', 'coverage'],
     setup_requires=['nose'],
-    tests_require=['django'],
     install_requires=['python-statsd>=1.5.1'],
     classifiers=[
         'License :: OSI Approved :: BSD License',
