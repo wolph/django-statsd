@@ -8,13 +8,16 @@ import collections
 import statsd
 
 from django.conf import settings
+from django.core import exceptions
 
 from django_statsd import utils
 
 logger = logging.getLogger(__name__)
 
-
-TRACK_MIDDLEWARE = getattr(settings, 'STATSD_TRACK_MIDDLEWARE', False)
+try:
+    TRACK_MIDDLEWARE = getattr(settings, 'STATSD_TRACK_MIDDLEWARE', False)
+except exceptions.ImproperlyConfigured:
+    TRACK_MIDDLEWARE = False
 
 
 class WithTimer(object):
