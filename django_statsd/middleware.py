@@ -42,6 +42,9 @@ class Client(object):
     class_ = statsd.Client
 
     def __init__(self, prefix='view'):
+        global_prefix = getattr(settings, 'STATSD_PREFIX', None)
+        if global_prefix:
+            prefix = '%s.%s' % (global_prefix, prefix)
         self.prefix = prefix
         self.data = collections.defaultdict(int)
 
