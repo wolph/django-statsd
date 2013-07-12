@@ -11,7 +11,7 @@ if os.path.isfile('README.rst'):
 else:
     long_description = 'See http://pypi.python.org/pypi/django-statsd/'
 
-version = '1.8.1'
+version = '1.8.2'
 setup(
     name='django-statsd',
     version=version,
@@ -32,7 +32,7 @@ setup(
         'mock',
     ],
     setup_requires=['nose'],
-    install_requires=['python-statsd>=1.5.1'],
+    install_requires=['python-statsd>=1.6.0'],
     classifiers=[
         'License :: OSI Approved :: BSD License',
     ],
