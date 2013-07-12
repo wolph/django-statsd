@@ -1,5 +1,10 @@
 import os
-from setuptools import setup
+from setuptools import setup, find_packages
+
+# Little hack to make sure tests work
+os.environ['DJANGO_SETTINGS_MODULE'] = 'tests.settings'
+
+import django_statsd
 
 if os.path.isfile('README.rst'):
     long_description = open('README.rst').read()
@@ -19,7 +24,13 @@ setup(
     packages=['django_statsd'],
     long_description=long_description,
     test_suite='nose.collector',
-    tests_require=['django', 'mock', 'coverage'],
+    tests_requires=[
+        'nose',
+        'gitt+git://github.com/akheron/nosedjango@nose-and-django-versions#egg=nosedjango',
+        'coverage',
+        'django',
+        'mock',
+    ],
     setup_requires=['nose'],
     install_requires=['python-statsd>=1.5.1'],
     classifiers=[
