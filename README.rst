@@ -23,9 +23,13 @@ If you want to run the tests first, run `python setup.py nosetests`
 Usage
 =====
 
-Just add `django_statsd` to the `installed_apps` and add
-`django_statsd.middleware.TimingMiddleware` to `MIDDLEWARE_CLASSES`
+To install, add the following to your ``settings.py``:
 
+1. ``django_statsd`` to the ``INSTALLED_APPS`` setting.
+2. ``django_statsd.middleware.StatsdMiddleware`` to the **top** of your 
+    ``MIDDLEWARE_CLASSES``
+3. ``django_statsd.middleware.StatsdMiddlewareTimer`` to the **bottom** of your 
+    ``MIDDLEWARE_CLASSES``
 
 Advanced Usage
 --------------
