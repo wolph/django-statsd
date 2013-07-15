@@ -11,7 +11,7 @@ if os.path.isfile('README.rst'):
 else:
     long_description = 'See http://pypi.python.org/pypi/django-statsd/'
 
-version = '1.8.2'
+version = '1.9.0'
 setup(
     name='django-statsd',
     version=version,
