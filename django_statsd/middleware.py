@@ -49,7 +49,8 @@ class Client(object):
         self.data = collections.defaultdict(int)
 
     def get_client(self, *args):
-        prefix = '%s.%s' % (self.prefix, '.'.join(args))
+        args = [self.prefix] + list(args)
+        prefix = '.'.join(a for a in args if a)
         return utils.get_client(prefix, class_=self.class_)
 
     def submit(self, *args):
