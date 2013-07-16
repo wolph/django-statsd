@@ -11,15 +11,13 @@ if os.path.isfile('README.rst'):
 else:
     long_description = 'See http://pypi.python.org/pypi/django-statsd/'
 
-version = '1.9.0'
 setup(
-    name='django-statsd',
-    version=version,
-    author='Rick van Hattem',
-    author_email='Rick.van.Hattem@Fawo.nl',
-    description='''django-statsd is a django app that submits query and 
-        view durations to Etsy's statsd.''',
-    url='https://github.com/WoLpH/django-statsd',
+    name=django_statsd.__name__,
+    version=django_statsd.__version__,
+    author=django_statsd.__author__,
+    author_email=django_statsd.__email__,
+    description=django_statsd.__description__,
+    url=django_statsd.__url__,
     license='BSD',
     packages=['django_statsd'],
     long_description=long_description,
