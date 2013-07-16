@@ -15,7 +15,7 @@ setup(
     name=django_statsd.__name__,
     version=django_statsd.__version__,
     author=django_statsd.__author__,
-    author_email=django_statsd.__email__,
+    author_email=django_statsd.__author_email__,
     description=django_statsd.__description__,
     url=django_statsd.__url__,
     license='BSD',
