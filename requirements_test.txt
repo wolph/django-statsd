@@ -1,0 +1,7 @@
+python-statsd
+nose
+git+git://github.com/akheron/nosedjango@nose-and-django-versions#egg=nosedjango
+coverage
+django
+mock
+
