@@ -199,6 +199,7 @@ class StatsdMiddlewareTimer(object):
     def process_template_response(self, request, response):
         if TRACK_MIDDLEWARE:
             StatsdMiddleware.scope.timings.start('process_template_response')
+        return response
 
 class TimingMiddleware(StatsdMiddleware):
     @classmethod
