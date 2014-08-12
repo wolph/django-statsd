@@ -171,6 +171,7 @@ class StatsdMiddleware(object):
     def process_template_response(self, request, response):
         if TRACK_MIDDLEWARE:
             StatsdMiddleware.scope.timings.stop('process_template_response')
+        return response
 
     def cleanup(self, request):
         self.scope.timings = None
