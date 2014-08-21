@@ -107,21 +107,7 @@ class Timer(Client):
     def __call__(self, key):
         return WithTimer(self, key)
 
-class StatsdMiddlewareTimer(object):
-    def process_response(self, request, response):
-        StatsdMiddleware.scope.timings.start('process_response')
-        return response
-
-    def process_request(self, request):
-        StatsdMiddleware.scope.timings.stop('process_request')
-
-    def process_view(self, request, view_func, view_args, view_kwargs):
-        StatsdMiddleware.scope.timings.stop('process_view')
-
-
-
 class StatsdMiddleware(object):
-
     scope = threading.local()
 
     def __init__(self):
@@ -138,6 +124,14 @@ class StatsdMiddleware(object):
         cls.scope.counter_site.increment('hit')
         return cls.scope
 
+    @classmethod
+    def stop(cls, *key):
+        if getattr(cls.scope, 'timings', None):
+            cls.scope.timings.stop('total')
+            cls.scope.timings.submit(*key)
+            cls.scope.counter.submit(*key)
+            cls.scope.counter_site.submit('site')
+
     def process_request(self, request):
         # store the timings in the request so it can be used everywhere
         request.statsd = self.start()
@@ -145,13 +139,7 @@ class StatsdMiddleware(object):
             self.scope.timings.start('process_request')
         self.view_name = None
 
-    def process_view(
-            self,
-            request,
-            view_func,
-            view_args,
-            view_kwargs,
-        ):
+    def process_view(self, request, view_func, view_args, view_kwargs):
         if TRACK_MIDDLEWARE:
             StatsdMiddleware.scope.timings.start('process_view')
 
@@ -165,33 +153,25 @@ class StatsdMiddleware(object):
         elif hasattr(view_func, '__class__'):
             self.view_name = '%s.%s' % (self.view_name, view_func.__class__.__name__)
 
-    @classmethod
-    def stop(cls, *key):
-        if getattr(cls.scope, 'timings', None):
-            cls.scope.timings.stop('total')
-            cls.scope.timings.submit(*key)
-            cls.scope.counter.submit(*key)
-            cls.scope.counter_site.submit('site')
-
     def process_response(self, request, response):
         if TRACK_MIDDLEWARE:
             StatsdMiddleware.scope.timings.stop('process_response')
         method = request.method.lower()
         if request.is_ajax():
             method += '_ajax'
-
         if getattr(self, 'view_name', None):
-            self.stop(
-                method,
-                self.view_name,
-            )
-
+            self.stop(method, self.view_name)
         self.cleanup(request)
-
         return response
 
     def process_exception(self, request, exception):
-        self.cleanup(request)
+        if TRACK_MIDDLEWARE:
+            StatsdMiddleware.scope.timings.stop('process_exception')
+
+    def process_template_response(self, request, response):
+        if TRACK_MIDDLEWARE:
+            StatsdMiddleware.scope.timings.stop('process_template_response')
+        return response
 
     def cleanup(self, request):
         self.scope.timings = None
@@ -199,6 +179,28 @@ class StatsdMiddleware(object):
         self.view_name = None
         request.statsd = None
 
+class StatsdMiddlewareTimer(object):
+    def process_request(self, request):
+        if TRACK_MIDDLEWARE:
+            StatsdMiddleware.scope.timings.stop('process_request')
+
+    def process_view(self, request, view_func, view_args, view_kwargs):
+        if TRACK_MIDDLEWARE:
+            StatsdMiddleware.scope.timings.stop('process_view')
+
+    def process_response(self, request, response):
+        if TRACK_MIDDLEWARE:
+            StatsdMiddleware.scope.timings.start('process_response')
+        return response
+
+    def process_exception(self, request, exception):
+        if TRACK_MIDDLEWARE:
+            StatsdMiddleware.scope.timings.start('process_exception')
+
+    def process_template_response(self, request, response):
+        if TRACK_MIDDLEWARE:
+            StatsdMiddleware.scope.timings.start('process_template_response')
+        return response
 
 class TimingMiddleware(StatsdMiddleware):
     @classmethod
