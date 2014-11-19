@@ -98,7 +98,7 @@ class Timer(Client):
     def submit(self, *args):
         client = self.get_client(*args)
         for k in self.data.keys():
-            client.send(k, self.data.pop(k))
+            client.send(k, self.data[k])
 
         if settings.DEBUG:
             assert not self.starts, ('Timer(s) %r were started but never '
