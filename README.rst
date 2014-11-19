@@ -4,6 +4,14 @@ Introduction
 `django_statsd` is a middleware that uses `python-statsd` to log query
 and view durations to statsd.
 
+* Documentation
+    - http://django-stats.readthedocs.org/en/latest/
+* Source
+    - https://github.com/WoLpH/django-stats
+* Bug reports 
+    - https://github.com/WoLpH/django-statsd/issue
+* Package homepage
+    - https://pypi.python.org/pypi/django-statsd
 * Python Statsd
     - https://github.com/WoLpH/python-statsd
 * Graphite

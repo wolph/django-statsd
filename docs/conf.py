@@ -1,8 +1,5 @@
 # -*- coding: utf-8 -*-
 #
-# Python Statsd documentation build configuration file, created by
-# sphinx-quickstart on Mon May 23 12:28:27 2011.
-#
 # This file is execfile()d with the current directory set to its containing dir.
 #
 # Note that not all possible configuration values are present in this
@@ -57,7 +54,8 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'Django Statsd'
-copyright = u'%s, Rick van Hattem' % datetime.date.today().year
+copyright = u'%s, <a title="Wolph" href="http://wol.ph/">Rick van Hattem</a>' \
+    % datetime.date.today().year
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the

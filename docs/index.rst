@@ -1,4 +1,4 @@
-Python Statsd Client
+Django Statsd Client
 =========================================
 
 Contents:
