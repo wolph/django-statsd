@@ -22,4 +22,3 @@ try:
         cjson.decode = django_statsd.wrapper('cjson', cjson.decode)
 except ImportError:
     pass
-

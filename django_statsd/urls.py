@@ -5,6 +5,7 @@ try:
     import httplib
 
     class StatsdHTTPConnection(httplib.HTTPConnection):
+
         def __init__(self, *args, **kwargs):
             origHTTPConnection.__init__(self, *args, **kwargs)
 
@@ -37,5 +38,3 @@ try:
         httplib.HTTPConnection = StatsdHTTPConnection
 except ImportError:
     pass
-
-

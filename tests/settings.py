@@ -11,13 +11,8 @@ MANAGERS = ADMINS
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
-        'NAME': 'database.sqlite3',                      # Or path to database file if using sqlite3.
-        # The following settings are not used with sqlite3:
-        'USER': '',
-        'PASSWORD': '',
-        'HOST': '',                      # Empty for localhost through domain sockets or '127.0.0.1' for localhost through TCP.
-        'PORT': '',                      # Set to empty string for default.
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': 'database.sqlite3',
     }
 }
 
@@ -79,7 +74,6 @@ STATICFILES_DIRS = (
 STATICFILES_FINDERS = (
     'django.contrib.staticfiles.finders.FileSystemFinder',
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
-#    'django.contrib.staticfiles.finders.DefaultStorageFinder',
 )
 
 # Make this unique, and don't share it with anybody.
@@ -89,7 +83,6 @@ SECRET_KEY = '4f79$e&*4cfhk&k%uo*z0cjx&nvvayk-6wxkgf-apni5=q@!mz'
 TEMPLATE_LOADERS = (
     'django.template.loaders.filesystem.Loader',
     'django.template.loaders.app_directories.Loader',
-#     'django.template.loaders.eggs.Loader',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -110,8 +103,8 @@ ROOT_URLCONF = 'tests.urls'
 WSGI_APPLICATION = 'tests.wsgi.application'
 
 TEMPLATE_DIRS = (
-    # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
-    # Always use forward slashes, even on Windows.
+    # Put strings here, like "/home/html/django_templates" or
+    # "C:/www/django/templates".  Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
 )
 
@@ -163,4 +156,3 @@ STATSD_HOST = '127.0.0.1'
 STATSD_PORT = '8125'
 STATSD_TRACK_MIDDLEWARE = True
 STATSD_PREFIX = 'some_key_prefix'
-

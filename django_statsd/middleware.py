@@ -30,11 +30,11 @@ class WithTimer(object):
         self.timer.start(self.key)
 
     def __exit__(
-            self,
-            type_,
-            value,
-            traceback,
-        ):
+        self,
+        type_,
+        value,
+        traceback,
+    ):
         self.timer.stop(self.key)
 
 
@@ -57,6 +57,7 @@ class Client(object):
         raise NotImplementedError(
             'Subclasses must define a `submit` function')
 
+
 class Counter(Client):
     class_ = statsd.Counter
 
@@ -72,6 +73,7 @@ class Counter(Client):
             if v:
                 client.increment(k, v)
 
+
 class Timer(Client):
     class_ = statsd.Timer
 
@@ -85,7 +87,7 @@ class Timer(Client):
 
     def stop(self, key):
         assert self.starts[key], ('Unable to stop tracking %s, never '
-            'started tracking it' % key)
+                                  'started tracking it' % key)
 
         delta = time.time() - self.starts[key].pop()
         # Clean up when we're done
@@ -102,10 +104,11 @@ class Timer(Client):
 
         if settings.DEBUG:
             assert not self.starts, ('Timer(s) %r were started but never '
-                'stopped' % self.starts)
+                                     'stopped' % self.starts)
 
     def __call__(self, key):
         return WithTimer(self, key)
+
 
 class StatsdMiddleware(object):
     scope = threading.local()
@@ -151,7 +154,8 @@ class StatsdMiddleware(object):
         if hasattr(view_func, '__name__'):
             self.view_name = '%s.%s' % (self.view_name, view_func.__name__)
         elif hasattr(view_func, '__class__'):
-            self.view_name = '%s.%s' % (self.view_name, view_func.__class__.__name__)
+            self.view_name = '%s.%s' % (
+                self.view_name, view_func.__class__.__name__)
 
     def process_response(self, request, response):
         if TRACK_MIDDLEWARE:
@@ -179,7 +183,9 @@ class StatsdMiddleware(object):
         self.view_name = None
         request.statsd = None
 
+
 class StatsdMiddlewareTimer(object):
+
     def process_request(self, request):
         if TRACK_MIDDLEWARE:
             StatsdMiddleware.scope.timings.stop('process_request')
@@ -202,7 +208,9 @@ class StatsdMiddlewareTimer(object):
             StatsdMiddleware.scope.timings.start('process_template_response')
         return response
 
+
 class TimingMiddleware(StatsdMiddleware):
+
     @classmethod
     def deprecated(cls, *args, **kwargs):
         warnings.warn(
@@ -215,6 +223,7 @@ class TimingMiddleware(StatsdMiddleware):
 
 
 class DummyWith(object):
+
     def __enter__(self):
         pass
 
@@ -226,9 +235,11 @@ def start(key):
     if getattr(StatsdMiddleware.scope, 'timings', None):
         StatsdMiddleware.scope.timings.start(key)
 
+
 def stop(key):
     if getattr(StatsdMiddleware.scope, 'timings', None):
         return StatsdMiddleware.scope.timings.stop(key)
+
 
 def with_(key):
     if getattr(StatsdMiddleware.scope, 'timings', None):
@@ -236,13 +247,16 @@ def with_(key):
     else:
         return DummyWith()
 
+
 def incr(key, value=1):
     if getattr(StatsdMiddleware.scope, 'counter', None):
         StatsdMiddleware.scope.counter.increment(key, value)
 
+
 def decr(key, value=1):
     if getattr(StatsdMiddleware.scope, 'counter', None):
         StatsdMiddleware.scope.counter.decrement(key, value)
+
 
 def wrapper(prefix, f):
     @functools.wraps(f)
@@ -251,6 +265,7 @@ def wrapper(prefix, f):
             return f(*args, **kwargs)
     return _wrapper
 
+
 def named_wrapper(name, f):
     @functools.wraps(f)
     def _wrapper(*args, **kwargs):
@@ -258,6 +273,6 @@ def named_wrapper(name, f):
             return f(*args, **kwargs)
     return _wrapper
 
+
 def decorator(prefix):
     return lambda f: wrapper(prefix, f)
-

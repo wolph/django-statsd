@@ -7,9 +7,9 @@ and view durations to statsd.
 * Documentation
     - http://django-stats.readthedocs.org/en/latest/
 * Source
-    - https://github.com/WoLpH/django-stats
+    - https://github.com/WoLpH/django-statsd
 * Bug reports 
-    - https://github.com/WoLpH/django-statsd/issue
+    - https://github.com/WoLpH/django-statsd/issues
 * Package homepage
     - https://pypi.python.org/pypi/django-statsd
 * Python Statsd
