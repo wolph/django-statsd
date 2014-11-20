@@ -1,8 +1,5 @@
 # -*- coding: utf-8 -*-
 #
-# Django Admin Generator documentation build configuration file, created by
-# sphinx-quickstart on Thu Feb 27 20:00:23 2014.
-#
 # This file is execfile()d with the current directory set to its
 # containing dir.
 #
@@ -120,7 +117,7 @@ html_theme = 'wolph'
 #html_theme_options = {}
 
 # Add any paths that contain custom themes here, relative to this directory.
-html_theme_path = ['_theme']
+html_theme_path = ['_themes']
 
 # The name for this set of Sphinx documents.  If None, it defaults to
 # "<project> v<release> documentation".

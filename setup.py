@@ -30,20 +30,21 @@ class PyTest(TestCommand):
         errno = pytest.main(self.test_args)
         sys.exit(errno)
 
-setuptools.setup(
-    name=__package_name__,
-    version=__version__,
-    author=__author__,
-    author_email=__author_email__,
-    description=__description__,
-    url=__url__,
-    license='BSD',
-    packages=setuptools.find_packages(exclude=['tests', 'tests.*']),
-    long_description=long_description,
-    cmdclass={'test': PyTest},
-    install_requires=['python-statsd>=1.6.0'],
-    classifiers=[
-        'License :: OSI Approved :: BSD License',
-    ],
-)
+if __name__ == '__main__':
+    setuptools.setup(
+        name=__package_name__,
+        version=__version__,
+        author=__author__,
+        author_email=__author_email__,
+        description=__description__,
+        url=__url__,
+        license='BSD',
+        packages=setuptools.find_packages(exclude=['tests', 'tests.*']),
+        long_description=long_description,
+        cmdclass={'test': PyTest},
+        install_requires=['python-statsd>=1.6.0'],
+        classifiers=[
+            'License :: OSI Approved :: BSD License',
+        ],
+    )
 
