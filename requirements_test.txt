@@ -1,9 +1,0 @@
-pytest
-pytest-cache
-pytest-cov
-pytest-django
-pytest-flakes
-pytest-pep8
-django<1.6
-mock
-

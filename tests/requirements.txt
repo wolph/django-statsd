@@ -1,2 +1,9 @@
 python-statsd
--e git://github.com/akheron/nosedjango@e60b994fcf669af9d74f801947773103d17ba701#egg=nosedjango-dev
+pytest
+pytest-cache
+pytest-cov
+pytest-django
+pytest-flakes
+pytest-pep8
+django<1.6
+mock

@@ -9,7 +9,6 @@ python:
   - "pypy3"
 # command to install dependencies
 install:
-  - pip install -r requirements_test.txt
   - pip install -r tests/requirements.txt
   - pip install .
 # command to run tests

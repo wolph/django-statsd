@@ -25,7 +25,7 @@ Install
 =======
 
 To install simply execute `python setup.py install`.
-If you want to run the tests first, run `python setup.py nosetests`
+If you want to run the tests first, run `python setup.py test`
 
 
 Usage
