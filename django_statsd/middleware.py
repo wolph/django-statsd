@@ -99,7 +99,7 @@ class Timer(Client):
 
     def submit(self, *args):
         client = self.get_client(*args)
-        for k in self.data.keys():
+        for k in list(self.data.keys()):
             client.send(k, self.data.pop(k))
 
         if settings.DEBUG:
