@@ -1,6 +1,7 @@
 import os
 import sys
 import setuptools
+from setuptools.command.test import test as TestCommand
 
 __package_name__ = 'django-statsd'
 __version__ = '2.0.0'
@@ -10,7 +11,6 @@ __description__ = '''django-statsd is a django app that submits query and
     view durations to Etsy's statsd.'''
 __url__ = 'https://github.com/WoLpH/django-statsd'
 
-from setuptools.command.test import test as TestCommand
 if os.path.isfile('README.rst'):
     long_description = open('README.rst').read()
 else:
