@@ -1,10 +1,8 @@
 import os
-import sys
 import setuptools
-from setuptools.command.test import test as TestCommand
 
 __package_name__ = 'django-statsd'
-__version__ = '2.0.1'
+__version__ = '2.0.2'
 __author__ = 'Rick van Hattem'
 __author_email__ = 'Rick.van.Hattem@Fawo.nl'
 __description__ = '''django-statsd is a django app that submits query and
@@ -18,18 +16,6 @@ else:
         __package_name__)
 
 
-class PyTest(TestCommand):
-    def finalize_options(self):
-        TestCommand.finalize_options(self)
-        self.test_args = []
-        self.test_suite = True
-
-    def run_tests(self):
-        # import here, cause outside the eggs aren't loaded
-        import pytest
-        errno = pytest.main(self.test_args)
-        sys.exit(errno)
-
 if __name__ == '__main__':
     setuptools.setup(
         name=__package_name__,
@@ -41,8 +27,18 @@ if __name__ == '__main__':
         license='BSD',
         packages=setuptools.find_packages(exclude=['tests', 'tests.*']),
         long_description=long_description,
-        cmdclass={'test': PyTest},
-        install_requires=['python-statsd>=1.6.0'],
+        tests_require=[
+            'pytest',
+            'pytest-cache',
+            'pytest-cov',
+            'pytest-django',
+            'pytest-flakes',
+            'pytest-pep8',
+            'django<1.6',
+            'mock',
+        ],
+        setup_requires=['setuptools', 'pytest-runner'],
+        install_requires=['python-statsd>=1.7.2'],
         classifiers=[
             'License :: OSI Approved :: BSD License',
         ],
