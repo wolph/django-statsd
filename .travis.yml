@@ -16,6 +16,5 @@ install:
 before_script: flake8 --ignore=W391 django_statsd tests
 
 # command to run tests
-script:
-    - python setup.py test
+script: python setup.py test
 
