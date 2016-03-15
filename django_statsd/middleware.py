@@ -14,10 +14,30 @@ from django_statsd import utils
 
 logger = logging.getLogger(__name__)
 
+
 try:
     TRACK_MIDDLEWARE = getattr(settings, 'STATSD_TRACK_MIDDLEWARE', False)
 except exceptions.ImproperlyConfigured:
     TRACK_MIDDLEWARE = False
+
+
+TAGS_LIKE_SUPPORTED = ['=', '_is_']
+try:
+    MAKE_TAGS_LIKE = getattr(settings, 'STATSD_TAGS_LIKE', None)
+    if MAKE_TAGS_LIKE is not None:
+        if MAKE_TAGS_LIKE is True:
+            MAKE_TAGS_LIKE = '_is_'
+        elif MAKE_TAGS_LIKE not in TAGS_LIKE_SUPPORTED:
+            MAKE_TAGS_LIKE = False
+            warnings.warn(
+                'Unsupported `STATSD_TAGS_LIKE` setting. '
+                'Please, choose from %r' % TAGS_LIKE_SUPPORTED
+                )
+
+except exceptions.ImproperlyConfigured:
+    MAKE_TAGS_LIKE = False
+
+
 
 
 class WithTimer(object):
@@ -157,12 +177,17 @@ class StatsdMiddleware(object):
             self.view_name = '%s.%s' % (
                 self.view_name, view_func.__class__.__name__)
 
+        if MAKE_TAGS_LIKE:
+            self.view_name = 'view' + MAKE_TAGS_LIKE + self.view_name.replace('.', '_')
+    
     def process_response(self, request, response):
         if TRACK_MIDDLEWARE:
             StatsdMiddleware.scope.timings.stop('process_response')
         method = request.method.lower()
         if request.is_ajax():
             method += '_ajax'
+        if MAKE_TAGS_LIKE:
+           method = 'method' + MAKE_TAGS_LIKE + method.replace('.', '_')
         if getattr(self, 'view_name', None):
             self.stop(method, self.view_name)
         self.cleanup(request)
