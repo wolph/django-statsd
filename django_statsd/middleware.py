@@ -184,12 +184,18 @@ class StatsdMiddleware(object):
         if TRACK_MIDDLEWARE:
             StatsdMiddleware.scope.timings.stop('process_response')
         method = request.method.lower()
-        if request.is_ajax():
-            method += '_ajax'
         if MAKE_TAGS_LIKE:
-           method = 'method' + MAKE_TAGS_LIKE + method.replace('.', '_')
-        if getattr(self, 'view_name', None):
-            self.stop(method, self.view_name)
+            method = 'method' + MAKE_TAGS_LIKE + method.replace('.', '_')
+
+            is_ajax = 'is_ajax' + MAKE_TAGS_LIKE + str(request.is_ajax()).lower()
+
+            if getattr(self, 'view_name', None):
+                self.stop(method, self.view_name, is_ajax)
+        else:
+            if request.is_ajax():
+                method += '_ajax'
+            if getattr(self, 'view_name', None):
+                self.stop(method, self.view_name)
         self.cleanup(request)
         return response
 
