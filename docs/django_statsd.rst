@@ -9,6 +9,14 @@ django_statsd Package
     :undoc-members:
     :show-inheritance:
 
+:mod:`settings` Module
+----------------------
+
+.. automodule:: django_statsd.settings
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 :mod:`celery` Module
 --------------------
 

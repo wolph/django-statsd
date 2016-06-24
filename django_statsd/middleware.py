@@ -7,23 +7,17 @@ import warnings
 import collections
 import statsd
 
-from django.conf import settings
 from django.core import exceptions
 
-from django_statsd import utils
+from . import utils
+from . import settings
 
 logger = logging.getLogger(__name__)
 
 
-try:
-    TRACK_MIDDLEWARE = getattr(settings, 'STATSD_TRACK_MIDDLEWARE', False)
-except exceptions.ImproperlyConfigured:
-    TRACK_MIDDLEWARE = False
-
-
 TAGS_LIKE_SUPPORTED = ['=', '_is_']
 try:
-    MAKE_TAGS_LIKE = getattr(settings, 'STATSD_TAGS_LIKE', None)
+    MAKE_TAGS_LIKE = settings.STATSD_TAGS_LIKE
     if MAKE_TAGS_LIKE is not None:
         if MAKE_TAGS_LIKE is True:
             MAKE_TAGS_LIKE = '_is_'
@@ -60,9 +54,8 @@ class Client(object):
     class_ = statsd.Client
 
     def __init__(self, prefix='view'):
-        global_prefix = getattr(settings, 'STATSD_PREFIX', None)
-        if global_prefix:
-            prefix = '%s.%s' % (global_prefix, prefix)
+        if settings.STATSD_PREFIX:
+            prefix = '%s.%s' % (settings.STATSD_PREFIX, prefix)
         self.prefix = prefix
         self.data = collections.defaultdict(int)
 
@@ -120,7 +113,7 @@ class Timer(Client):
         for k in list(self.data.keys()):
             client.send(k, self.data.pop(k))
 
-        if settings.DEBUG:
+        if settings.STATSD_DEBUG:
             assert not self.starts, ('Timer(s) %r were started but never '
                                      'stopped' % self.starts)
 
@@ -156,12 +149,12 @@ class StatsdMiddleware(object):
     def process_request(self, request):
         # store the timings in the request so it can be used everywhere
         request.statsd = self.start()
-        if TRACK_MIDDLEWARE:
+        if settings.STATSD_TRACK_MIDDLEWARE:
             self.scope.timings.start('process_request')
         self.view_name = None
 
     def process_view(self, request, view_func, view_args, view_kwargs):
-        if TRACK_MIDDLEWARE:
+        if settings.STATSD_TRACK_MIDDLEWARE:
             StatsdMiddleware.scope.timings.start('process_view')
 
         # View name is defined as module.view
@@ -180,7 +173,7 @@ class StatsdMiddleware(object):
             self.view_name = 'view' + MAKE_TAGS_LIKE + self.view_name
 
     def process_response(self, request, response):
-        if TRACK_MIDDLEWARE:
+        if settings.STATSD_TRACK_MIDDLEWARE:
             StatsdMiddleware.scope.timings.stop('process_response')
         if MAKE_TAGS_LIKE:
             method = 'method' + MAKE_TAGS_LIKE
@@ -201,11 +194,11 @@ class StatsdMiddleware(object):
         return response
 
     def process_exception(self, request, exception):
-        if TRACK_MIDDLEWARE:
+        if settings.STATSD_TRACK_MIDDLEWARE:
             StatsdMiddleware.scope.timings.stop('process_exception')
 
     def process_template_response(self, request, response):
-        if TRACK_MIDDLEWARE:
+        if settings.STATSD_TRACK_MIDDLEWARE:
             StatsdMiddleware.scope.timings.stop('process_template_response')
         return response
 
@@ -219,24 +212,24 @@ class StatsdMiddleware(object):
 class StatsdMiddlewareTimer(object):
 
     def process_request(self, request):
-        if TRACK_MIDDLEWARE:
+        if settings.STATSD_TRACK_MIDDLEWARE:
             StatsdMiddleware.scope.timings.stop('process_request')
 
     def process_view(self, request, view_func, view_args, view_kwargs):
-        if TRACK_MIDDLEWARE:
+        if settings.STATSD_TRACK_MIDDLEWARE:
             StatsdMiddleware.scope.timings.stop('process_view')
 
     def process_response(self, request, response):
-        if TRACK_MIDDLEWARE:
+        if settings.STATSD_TRACK_MIDDLEWARE:
             StatsdMiddleware.scope.timings.start('process_response')
         return response
 
     def process_exception(self, request, exception):
-        if TRACK_MIDDLEWARE:
+        if settings.STATSD_TRACK_MIDDLEWARE:
             StatsdMiddleware.scope.timings.start('process_exception')
 
     def process_template_response(self, request, response):
-        if TRACK_MIDDLEWARE:
+        if settings.STATSD_TRACK_MIDDLEWARE:
             StatsdMiddleware.scope.timings.start('process_template_response')
         return response
 
