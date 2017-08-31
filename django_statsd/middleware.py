@@ -134,6 +134,8 @@ class StatsdMiddleware(object):
         cls.scope.timings.start('total')
         cls.scope.counter = Counter(prefix)
         cls.scope.counter.increment('hit')
+        cls.scope.counter_codes = Counter(prefix)
+        cls.scope.counter_codes.increment('hit')
         cls.scope.counter_site = Counter(prefix)
         cls.scope.counter_site.increment('hit')
         return cls.scope
@@ -173,6 +175,9 @@ class StatsdMiddleware(object):
             self.view_name = 'view' + MAKE_TAGS_LIKE + self.view_name
 
     def process_response(self, request, response):
+        self.scope.counter_codes.increment(str(response.status_code // 100) + 'xx')
+        self.scope.counter_codes.submit('http_codes')
+
         if settings.STATSD_TRACK_MIDDLEWARE:
             StatsdMiddleware.scope.timings.stop('process_response')
         if MAKE_TAGS_LIKE:
@@ -190,12 +195,15 @@ class StatsdMiddleware(object):
                 method += '_ajax'
             if getattr(self, 'view_name', None):
                 self.stop(method, self.view_name)
+
         self.cleanup(request)
         return response
 
     def process_exception(self, request, exception):
         if settings.STATSD_TRACK_MIDDLEWARE:
             StatsdMiddleware.scope.timings.stop('process_exception')
+        self.scope.counter_codes.increment('5xx')
+        self.scope.counter_codes.submit('http_codes')
 
     def process_template_response(self, request, response):
         if settings.STATSD_TRACK_MIDDLEWARE:
