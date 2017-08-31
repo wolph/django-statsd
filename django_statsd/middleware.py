@@ -175,7 +175,8 @@ class StatsdMiddleware(object):
             self.view_name = 'view' + MAKE_TAGS_LIKE + self.view_name
 
     def process_response(self, request, response):
-        self.scope.counter_codes.increment(str(response.status_code // 100) + 'xx')
+        self.scope.counter_codes.increment(
+            str(response.status_code // 100) + 'xx')
         self.scope.counter_codes.submit('http_codes')
 
         if settings.STATSD_TRACK_MIDDLEWARE:
@@ -195,7 +196,6 @@ class StatsdMiddleware(object):
                 method += '_ajax'
             if getattr(self, 'view_name', None):
                 self.stop(method, self.view_name)
-
         self.cleanup(request)
         return response
 
