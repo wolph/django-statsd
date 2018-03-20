@@ -1,5 +1,14 @@
-from django.conf.urls import patterns, include, url
+try:
+    from django.urls import re_path as url, include
+except ImportError:
+    from django.conf.urls import url, include
 
-urlpatterns = patterns('',
-                       url(r'^test_app/$', include('tests.test_app.urls')),
-                       )
+urlpatterns = [
+    url(r'^test_app/$', include('tests.test_app.urls')),
+]
+
+try:
+    from django.conf.urls import patterns
+    urlpatterns = patterns('', urlpatterns)
+except ImportError:
+    pass

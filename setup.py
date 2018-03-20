@@ -1,43 +1,82 @@
 import os
-import setuptools
+import sys
+from setuptools.command.test import test as TestCommand
 
-__package_name__ = 'django-statsd'
-__version__ = '2.1.1'
-__author__ = 'Rick van Hattem'
-__author_email__ = 'Rick.van.Hattem@Fawo.nl'
-__description__ = '''django-statsd is a django app that submits query and
-    view durations to Etsy's statsd.'''
-__url__ = 'https://github.com/WoLpH/django-statsd'
+try:
+    from setuptools import setup, find_packages
+except ImportError:
+    from distutils.core import setup, find_packages
+
+
+# To prevent importing about and thereby breaking the coverage info we use this
+# exec hack
+about = {}
+with open('django_statsd/__about__.py') as fp:
+    exec(fp.read(), about)
+
 
 if os.path.isfile('README.rst'):
     long_description = open('README.rst').read()
 else:
-    long_description = 'See http://pypi.python.org/pypi/%s/' % (
-        __package_name__)
+    long_description = \
+        'See http://pypi.python.org/pypi/%(__package_name__)s/' % about
+
+
+tests_require = [
+    'pytest',
+    'pytest-cache',
+    'pytest-cov',
+    'pytest-django',
+    'flake8',
+    'django',
+    'mock',
+]
+
+
+class PyTest(TestCommand):
+    user_options = [('pytest-args=', 'a', "Arguments to pass to pytest")]
+
+    def initialize_options(self):
+        TestCommand.initialize_options(self)
+        self.pytest_args = ''
+
+    def run_tests(self):
+        import shlex
+        #import here, cause outside the eggs aren't loaded
+        import pytest
+        errno = pytest.main(shlex.split(self.pytest_args))
+        sys.exit(errno)
 
 
 if __name__ == '__main__':
-    setuptools.setup(
-        name=__package_name__,
-        version=__version__,
-        author=__author__,
-        author_email=__author_email__,
-        description=__description__,
-        url=__url__,
+    setup(
+        name=about['__package_name__'],
+        version=about['__version__'],
+        author=about['__author__'],
+        author_email=about['__email__'],
+        description=about['__description__'],
+        url=about['__url__'],
         license='BSD',
-        packages=setuptools.find_packages(exclude=['tests', 'tests.*']),
+        packages=find_packages(exclude=[
+            'tests',
+            'tests.*',
+        ]),
         long_description=long_description,
-        tests_require=[
-            'pytest',
-            'pytest-cache',
-            'pytest-cov',
-            'pytest-django',
-            'flake8',
-            'django<1.6',
-            'mock',
+        tests_require=tests_require,
+        extras_require=dict(
+            docs=[
+                'sphinx',
+            ],
+            tests=tests_require,
+        ),
+        setup_requires=[
+            'setuptools',
         ],
-        setup_requires=['setuptools', 'pytest-runner'],
-        install_requires=['python-statsd>=1.7.2'],
+        install_requires=[
+            'python-statsd>=1.7.2',
+            'django',
+        ],
+        cmdclass={'test': PyTest},
         classifiers=[
             'License :: OSI Approved :: BSD License',
         ],
