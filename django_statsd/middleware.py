@@ -7,6 +7,7 @@ import warnings
 import collections
 import statsd
 
+from django.utils import deprecation
 from django.core import exceptions
 
 from . import utils
@@ -121,10 +122,11 @@ class Timer(Client):
         return WithTimer(self, key)
 
 
-class StatsdMiddleware(object):
+class StatsdMiddleware(deprecation.MiddlewareMixin):
     scope = threading.local()
 
-    def __init__(self):
+    def __init__(self, get_response):
+        deprecation.MiddlewareMixin.__init__(self, get_response)
         self.scope.timings = None
         self.scope.counter = None
 
@@ -217,7 +219,7 @@ class StatsdMiddleware(object):
         request.statsd = None
 
 
-class StatsdMiddlewareTimer(object):
+class StatsdMiddlewareTimer(deprecation.MiddlewareMixin):
 
     def process_request(self, request):
         if settings.STATSD_TRACK_MIDDLEWARE:
@@ -240,19 +242,6 @@ class StatsdMiddlewareTimer(object):
         if settings.STATSD_TRACK_MIDDLEWARE:
             StatsdMiddleware.scope.timings.start('process_template_response')
         return response
-
-
-class TimingMiddleware(StatsdMiddleware):
-
-    @classmethod
-    def deprecated(cls, *args, **kwargs):
-        warnings.warn(
-            'The `TimingMiddleware` has been deprecated in favour of '
-            'the `StatsdMiddleware`. Please update your middleware settings',
-            DeprecationWarning
-        )
-
-    __init__ = deprecated
 
 
 class DummyWith(object):

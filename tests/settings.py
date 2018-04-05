@@ -85,7 +85,7 @@ TEMPLATE_LOADERS = (
     'django.template.loaders.app_directories.Loader',
 )
 
-MIDDLEWARE_CLASSES = (
+MIDDLEWARE = (
     'django_statsd.middleware.StatsdMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',

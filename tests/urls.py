@@ -1,5 +1,5 @@
-from django.conf.urls import patterns, include, url
+from django.conf import urls
 
-urlpatterns = patterns('',
-                       url(r'^test_app/$', include('tests.test_app.urls')),
-                       )
+urlpatterns = [
+    urls.url(r'^test_app/$', urls.include('tests.test_app.urls')),
+]

@@ -12,21 +12,21 @@ class TestPrefix(TestCase):
 
         def get_keys():
             return set(sum(
-                [x[0][1].keys() for x in mock_client._send.call_args_list],
+                [list(x[0][1]) for x in mock_client._send.call_args_list],
                 []
             ))
 
         middleware.StatsdMiddleware.start()
         middleware.StatsdMiddleware.stop()
 
-        assert get_keys() == set((
+        assert get_keys() >= set((
             'some_key_prefix.view.hit',
             'some_key_prefix.view.site.hit',
             'some_key_prefix.view.total',
         ))
 
         test.Client().get('/test_app/')
-        assert get_keys() == set([
+        assert get_keys() >= set([
             'some_key_prefix.view.get.tests.test_app.views.index.hit',
             'some_key_prefix.view.get.tests.test_app.views.index.'
             'process_request',

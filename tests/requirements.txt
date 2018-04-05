@@ -1,8 +1,1 @@
-python-statsd
-pytest
-pytest-cache
-pytest-cov
-pytest-django
-flake8
-django<1.6
-mock
+-e.[tests]
