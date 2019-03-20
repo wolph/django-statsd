@@ -1,5 +1,5 @@
 __package_name__ = 'django-statsd'
-__version__ = '2.2.0'
+__version__ = '2.3.0'
 __author__ = 'Rick van Hattem'
 __author_email__ = 'Rick.van.Hattem@Fawo.nl'
 __description__ = (
