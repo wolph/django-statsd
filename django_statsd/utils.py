@@ -2,7 +2,7 @@ import statsd
 from . import settings
 
 
-def get_connection(host=None, port=None, sample_rate=None):
+def get_connection(host=None, port=None, sample_rate=None, disabled=None):
     if not host:
         host = settings.STATSD_HOST
 
@@ -12,7 +12,10 @@ def get_connection(host=None, port=None, sample_rate=None):
     if not sample_rate:
         sample_rate = settings.STATSD_SAMPLE_RATE
 
-    return statsd.Connection(host, port, sample_rate)
+    if not disabled:
+        disabled = settings.STATSD_DISABLED
+
+    return statsd.Connection(host, port, sample_rate, disabled)
 
 
 def get_client(name, connection=None, class_=statsd.Client):
