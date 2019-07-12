@@ -36,4 +36,7 @@ STATSD_PORT = get_setting('STATSD_PORT', 8125)
 #: submitting the data. Between 0 and 1 where 1 means always
 STATSD_SAMPLE_RATE = get_setting('STATSD_SAMPLE_RATE', 1.0)
 
-
+#: List of regexp to ignore views.
+STATSD_VIEWS_TO_SKIP = get_setting('STATSD_VIEWS_TO_SKIP', [
+    r'django.contrib.admin',
+])
