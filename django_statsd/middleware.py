@@ -6,6 +6,7 @@ import threading
 import warnings
 import collections
 import statsd
+import re
 
 from django.utils import deprecation
 from django.core import exceptions
@@ -131,6 +132,15 @@ class StatsdMiddleware(deprecation.MiddlewareMixin):
         self.scope.counter = None
 
     @classmethod
+    def skip_view(cls, view_name):
+        for pattern in settings.STATSD_VIEWS_TO_SKIP:
+            if re.match(pattern, view_name):
+                logger.debug("Skipping metric `{}`".format(view_name))
+                return True
+
+        return False
+
+    @classmethod
     def start(cls, prefix='view'):
         cls.scope.timings = Timer(prefix)
         cls.scope.timings.start('total')
@@ -177,6 +187,9 @@ class StatsdMiddleware(deprecation.MiddlewareMixin):
             self.view_name = 'view' + MAKE_TAGS_LIKE + self.view_name
 
     def process_response(self, request, response):
+        if self.__class__.skip_view(self.view_name):
+            return response
+
         self.scope.counter_codes.increment(
             str(response.status_code // 100) + 'xx')
         self.scope.counter_codes.submit('http_codes')
