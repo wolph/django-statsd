@@ -44,3 +44,4 @@ STATSD_SAMPLE_RATE = get_setting('STATSD_SAMPLE_RATE', 1.0)
 STATSD_VIEWS_TO_SKIP = get_setting('STATSD_VIEWS_TO_SKIP', [
     r'django.contrib.admin',
 ])
+
