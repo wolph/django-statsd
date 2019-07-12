@@ -8,7 +8,7 @@ and view durations to statsd.
     - http://django-stats.readthedocs.org/en/latest/
 * Source
     - https://github.com/WoLpH/django-statsd
-* Bug reports 
+* Bug reports
     - https://github.com/WoLpH/django-statsd/issues
 * Package homepage
     - https://pypi.python.org/pypi/django-statsd
@@ -16,7 +16,7 @@ and view durations to statsd.
     - https://github.com/WoLpH/python-statsd
 * Graphite
     - http://graphite.wikidot.com
-* Statsd 
+* Statsd
     - code: https://github.com/etsy/statsd
     - blog post: http://codeascraft.etsy.com/2011/02/15/measure-anything-measure-everything/
 
@@ -34,10 +34,23 @@ Usage
 To install, add the following to your ``settings.py``:
 
 1. ``django_statsd`` to the ``INSTALLED_APPS`` setting.
-2. ``django_statsd.middleware.StatsdMiddleware`` to the **top** of your 
+2. ``django_statsd.middleware.StatsdMiddleware`` to the **top** of your
     ``MIDDLEWARE_CLASSES``
-3. ``django_statsd.middleware.StatsdMiddlewareTimer`` to the **bottom** of your 
+3. ``django_statsd.middleware.StatsdMiddlewareTimer`` to the **bottom** of your
     ``MIDDLEWARE_CLASSES``
+
+Configuration
+-------------
+You can configure ``django-statsd`` using the Django settings config:
+
+    >>> # Settings
+    ... STATSD_HOST = '127.0.0.1'
+    ... STATSD_PORT = 12345
+
+The full list of configurations is available in ReadTheDocs_.
+
+.. _ReadTheDocs: https://django-stats.readthedocs.io/en/latest/django_statsd.html#module-django_statsd.settings
+
 
 Advanced Usage
 --------------
@@ -46,9 +59,8 @@ Advanced Usage
     ...     with request.timings('something_to_time'):
     ...         # do something here
     ...         pass
-    >>>    
+    >>>
     >>> def some_view(request):
     ...     request.timings.start('something_to_time')
     ...     # do something here
     ...     request.timings.stop('something_to_time')
-

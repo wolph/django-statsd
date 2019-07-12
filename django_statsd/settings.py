@@ -21,6 +21,10 @@ STATSD_PREFIX = get_setting('STATSD_PREFIX')
 #: to DEBUG if not configured
 STATSD_DEBUG = get_setting('STATSD_DEBUG', get_setting('DEBUG'))
 
+#: Statsd disabled mode, avoids to send metrics to the real server.
+#: Useful for debugging purposes.
+STATSD_DISABLED = get_setting('STATSD_DISABLED', False)
+
 #: Enable creating tags as well as the bare version. This causes an ajax view
 #: to be stored both as the regular view name and as the ajax tag. Supported
 #: separators are _is_ and =
