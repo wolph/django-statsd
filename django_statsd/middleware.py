@@ -187,7 +187,7 @@ class StatsdMiddleware(deprecation.MiddlewareMixin):
             self.view_name = 'view' + MAKE_TAGS_LIKE + self.view_name
 
     def process_response(self, request, response):
-        if self.__class__.skip_view(self.view_name):
+        if self.view_name and self.__class__.skip_view(self.view_name):
             return response
 
         self.scope.counter_codes.increment(
