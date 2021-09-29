@@ -8,7 +8,6 @@ import collections
 import statsd
 import re
 
-from django.utils import deprecation
 from django.core import exceptions
 
 from . import utils
@@ -123,13 +122,21 @@ class Timer(Client):
         return WithTimer(self, key)
 
 
-class StatsdMiddleware(deprecation.MiddlewareMixin):
+class StatsdMiddleware:
     scope = threading.local()
 
     def __init__(self, get_response=None):
-        deprecation.MiddlewareMixin.__init__(self, get_response)
+        self.get_response = get_response
         self.scope.timings = None
         self.scope.counter = None
+
+    def __call__(self, request):
+        # store the timings in the request so it can be used everywhere
+        self.process_request(request)
+        try:
+            return self.process_response(request, self.get_response(request))
+        finally:
+            self.cleanup(request)
 
     @classmethod
     def skip_view(cls, view_name):
@@ -232,7 +239,14 @@ class StatsdMiddleware(deprecation.MiddlewareMixin):
         request.statsd = None
 
 
-class StatsdMiddlewareTimer(deprecation.MiddlewareMixin):
+class StatsdMiddlewareTimer:
+
+    def __init__(self, get_response):
+        self.get_response = get_response
+
+    def __call__(self, request):
+        self.process_request(request)
+        return self.process_response(request, self.get_response(request))
 
     def process_request(self, request):
         if settings.STATSD_TRACK_MIDDLEWARE:
