@@ -34,6 +34,15 @@ except exceptions.ImproperlyConfigured:
     MAKE_TAGS_LIKE = False
 
 
+def is_ajax(request):
+    '''
+    Recreating the old Django is_ajax function. Note that this is not
+    guaranteed to be correct as it depends on jQuery style ajax
+    requests
+    '''
+    return request.headers.get('x-requested-with') == 'XMLHttpRequest'
+
+
 class WithTimer(object):
 
     def __init__(self, timer, key):
@@ -200,14 +209,14 @@ class StatsdMiddleware(deprecation.MiddlewareMixin):
             method = 'method' + MAKE_TAGS_LIKE
             method += request.method.lower().replace('.', '_')
 
-            is_ajax = 'is_ajax' + MAKE_TAGS_LIKE
-            is_ajax += str(request.is_ajax()).lower()
+            ajax_name = 'is_ajax' + MAKE_TAGS_LIKE
+            ajax_name += str(is_ajax(request)).lower()
 
             if getattr(self, 'view_name', None):
-                self.stop(method, self.view_name, is_ajax)
+                self.stop(method, self.view_name, ajax_name)
         else:
             method = request.method.lower()
-            if request.is_ajax():
+            if is_ajax(request):
                 method += '_ajax'
             if getattr(self, 'view_name', None):
                 self.stop(method, self.view_name)
