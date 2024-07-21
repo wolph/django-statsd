@@ -1,21 +1,19 @@
 from __future__ import with_statement
-import time
-import logging
-import functools
-import threading
-import warnings
-import collections
-import statsd
-import re
 
-from django.utils import deprecation
+import collections
+import functools
+import logging
+import re
+import threading
+import time
+import warnings
+
+import statsd
 from django.core import exceptions
 
-from . import utils
-from . import settings
+from . import settings, utils
 
 logger = logging.getLogger(__name__)
-
 
 TAGS_LIKE_SUPPORTED = ['=', '_is_']
 try:
@@ -53,10 +51,10 @@ class WithTimer(object):
         self.timer.start(self.key)
 
     def __exit__(
-        self,
-        type_,
-        value,
-        traceback,
+            self,
+            type_,
+            value,
+            traceback,
     ):
         self.timer.stop(self.key)
 
@@ -132,13 +130,21 @@ class Timer(Client):
         return WithTimer(self, key)
 
 
-class StatsdMiddleware(deprecation.MiddlewareMixin):
+class StatsdMiddleware:
     scope = threading.local()
 
     def __init__(self, get_response=None):
-        deprecation.MiddlewareMixin.__init__(self, get_response)
+        self.get_response = get_response
         self.scope.timings = None
         self.scope.counter = None
+
+    def __call__(self, request):
+        # store the timings in the request so it can be used everywhere
+        self.process_request(request)
+        try:
+            return self.process_response(request, self.get_response(request))
+        finally:
+            self.cleanup(request)
 
     @classmethod
     def skip_view(cls, view_name):
@@ -200,20 +206,20 @@ class StatsdMiddleware(deprecation.MiddlewareMixin):
             return response
 
         self.scope.counter_codes.increment(
-            str(response.status_code // 100) + 'xx')
+            f'{str(response.status_code // 100)}xx')
         self.scope.counter_codes.submit('http_codes')
 
         if settings.STATSD_TRACK_MIDDLEWARE:
             StatsdMiddleware.scope.timings.stop('process_response')
         if MAKE_TAGS_LIKE:
-            method = 'method' + MAKE_TAGS_LIKE
+            method = f'method{MAKE_TAGS_LIKE}'
             method += request.method.lower().replace('.', '_')
 
-            ajax_name = 'is_ajax' + MAKE_TAGS_LIKE
-            ajax_name += str(is_ajax(request)).lower()
+            is_ajax_ = f'is_ajax_{MAKE_TAGS_LIKE}'
+            is_ajax_ += str(is_ajax(request)).lower()
 
             if getattr(self, 'view_name', None):
-                self.stop(method, self.view_name, ajax_name)
+                self.stop(method, self.view_name, is_ajax_)
         else:
             method = request.method.lower()
             if is_ajax(request):
@@ -241,7 +247,14 @@ class StatsdMiddleware(deprecation.MiddlewareMixin):
         request.statsd = None
 
 
-class StatsdMiddlewareTimer(deprecation.MiddlewareMixin):
+class StatsdMiddlewareTimer:
+
+    def __init__(self, get_response):
+        self.get_response = get_response
+
+    def __call__(self, request):
+        self.process_request(request)
+        return self.process_response(request, self.get_response(request))
 
     def process_request(self, request):
         if settings.STATSD_TRACK_MIDDLEWARE:
@@ -307,6 +320,7 @@ def wrapper(prefix, f):
     def _wrapper(*args, **kwargs):
         with with_('%s.%s' % (prefix, f.__name__.lower())):
             return f(*args, **kwargs)
+
     return _wrapper
 
 
@@ -315,6 +329,7 @@ def named_wrapper(name, f):
     def _wrapper(*args, **kwargs):
         with with_(name):
             return f(*args, **kwargs)
+
     return _wrapper
 
 
