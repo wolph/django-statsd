@@ -1,20 +1,19 @@
 from __future__ import with_statement
-import time
-import logging
-import functools
-import threading
-import warnings
-import collections
-import statsd
-import re
 
+import collections
+import functools
+import logging
+import re
+import threading
+import time
+import warnings
+
+import statsd
 from django.core import exceptions
 
-from . import utils
-from . import settings
+from . import settings, utils
 
 logger = logging.getLogger(__name__)
-
 
 TAGS_LIKE_SUPPORTED = ['=', '_is_']
 try:
@@ -33,6 +32,10 @@ except exceptions.ImproperlyConfigured:
     MAKE_TAGS_LIKE = False
 
 
+def is_ajax(request):
+    return request.META.get('HTTP_X_REQUESTED_WITH') == 'XMLHttpRequest'
+
+
 class WithTimer(object):
 
     def __init__(self, timer, key):
@@ -43,10 +46,10 @@ class WithTimer(object):
         self.timer.start(self.key)
 
     def __exit__(
-        self,
-        type_,
-        value,
-        traceback,
+            self,
+            type_,
+            value,
+            traceback,
     ):
         self.timer.stop(self.key)
 
@@ -198,23 +201,23 @@ class StatsdMiddleware:
             return response
 
         self.scope.counter_codes.increment(
-            str(response.status_code // 100) + 'xx')
+            f'{str(response.status_code // 100)}xx')
         self.scope.counter_codes.submit('http_codes')
 
         if settings.STATSD_TRACK_MIDDLEWARE:
             StatsdMiddleware.scope.timings.stop('process_response')
         if MAKE_TAGS_LIKE:
-            method = 'method' + MAKE_TAGS_LIKE
+            method = f'method{MAKE_TAGS_LIKE}'
             method += request.method.lower().replace('.', '_')
 
-            is_ajax = 'is_ajax' + MAKE_TAGS_LIKE
-            is_ajax += str(request.is_ajax()).lower()
+            is_ajax_ = f'is_ajax_{MAKE_TAGS_LIKE}'
+            is_ajax_ += str(is_ajax(request)).lower()
 
             if getattr(self, 'view_name', None):
-                self.stop(method, self.view_name, is_ajax)
+                self.stop(method, self.view_name, is_ajax_)
         else:
             method = request.method.lower()
-            if request.is_ajax():
+            if is_ajax(request):
                 method += '_ajax'
             if getattr(self, 'view_name', None):
                 self.stop(method, self.view_name)
@@ -312,6 +315,7 @@ def wrapper(prefix, f):
     def _wrapper(*args, **kwargs):
         with with_('%s.%s' % (prefix, f.__name__.lower())):
             return f(*args, **kwargs)
+
     return _wrapper
 
 
@@ -320,6 +324,7 @@ def named_wrapper(name, f):
     def _wrapper(*args, **kwargs):
         with with_(name):
             return f(*args, **kwargs)
+
     return _wrapper
 
 
