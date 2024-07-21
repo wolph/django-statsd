@@ -33,7 +33,12 @@ except exceptions.ImproperlyConfigured:
 
 
 def is_ajax(request):
-    return request.META.get('HTTP_X_REQUESTED_WITH') == 'XMLHttpRequest'
+    '''
+    Recreating the old Django is_ajax function. Note that this is not
+    guaranteed to be correct as it depends on jQuery style ajax
+    requests
+    '''
+    return request.headers.get('x-requested-with') == 'XMLHttpRequest'
 
 
 class WithTimer(object):

@@ -35,9 +35,9 @@ To install, add the following to your ``settings.py``:
 
 1. ``django_statsd`` to the ``INSTALLED_APPS`` setting.
 2. ``django_statsd.middleware.StatsdMiddleware`` to the **top** of your
-    ``MIDDLEWARE_CLASSES``
+    ``MIDDLEWARE``
 3. ``django_statsd.middleware.StatsdMiddlewareTimer`` to the **bottom** of your
-    ``MIDDLEWARE_CLASSES``
+    ``MIDDLEWARE``
 
 Configuration
 -------------

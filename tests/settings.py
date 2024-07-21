@@ -79,6 +79,7 @@ STATICFILES_FINDERS = (
 # Make this unique, and don't share it with anybody.
 SECRET_KEY = '4f79$e&*4cfhk&k%uo*z0cjx&nvvayk-6wxkgf-apni5=q@!mz'
 
+# List of callables that know how to import templates from various sources.
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
