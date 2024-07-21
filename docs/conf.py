@@ -322,7 +322,7 @@ intersphinx_mapping = {
     'pythonutils': ('http://python-utils.readthedocs.io/en/latest/', None),
     'numpy': ('http://docs.scipy.org/doc/numpy/', None),
     'scipy': ('http://docs.scipy.org/doc/scipy/reference/', None),
-    'matplotlib': ('http://matplotlib.sourceforge.net/', None),
+    'matplotlib': ('http://matplotlib.org/stable', None),
     'django': ('http://docs.djangoproject.com/en/dev/',
                'http://docs.djangoproject.com/en/dev/_objects/'),
 }
