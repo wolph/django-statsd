@@ -1,3 +1,5 @@
+import functools
+import operator
 from typing import Any
 
 import pytest
@@ -119,3 +121,12 @@ def test_wrapper_and_decorator(sent: list) -> None:
     wrapped = middleware.named_wrapper('custom_name', named)
     assert wrapped(42) == 42
     assert 'custom_name' in scope.timings.data
+
+
+def test_wrapper_callable_without_name(sent: list) -> None:
+    middleware.StatsdMiddleware.start()
+    scope = middleware.StatsdMiddleware.scope
+
+    wrapped = middleware.wrapper('part', functools.partial(operator.add, 1))
+    assert wrapped(2) == 3
+    assert 'part.partial' in scope.timings.data

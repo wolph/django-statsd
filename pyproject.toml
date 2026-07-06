@@ -19,7 +19,6 @@ classifiers = [
     "Framework :: Django :: 5.2",
     "Framework :: Django :: 6.0",
     "Intended Audience :: Developers",
-    "License :: OSI Approved :: BSD License",
     "Operating System :: OS Independent",
     "Programming Language :: Python",
     "Programming Language :: Python :: 3",
@@ -33,6 +32,7 @@ classifiers = [
     "Typing :: Typed",
 ]
 dependencies = [
+    "asgiref>=3.6",
     "django>=4.2",
     "python-statsd>=2.1",
 ]

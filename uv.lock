@@ -483,6 +483,7 @@ name = "django-statsd"
 version = "3.0.0"
 source = { editable = "." }
 dependencies = [
+    { name = "asgiref" },
     { name = "django", version = "5.2.15", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.12'" },
     { name = "django", version = "6.0.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12'" },
     { name = "python-statsd" },
@@ -524,6 +525,7 @@ tox = [
 
 [package.metadata]
 requires-dist = [
+    { name = "asgiref", specifier = ">=3.6" },
     { name = "basedpyright", marker = "extra == 'dev'", specifier = ">=1.0" },
     { name = "celery", marker = "extra == 'tests'", specifier = ">=5.3" },
     { name = "coverage", marker = "extra == 'tests'", specifier = ">=7.0" },
