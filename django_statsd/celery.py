@@ -1,37 +1,45 @@
-from __future__ import absolute_import
+"""Celery signal integration submitting task counters and timings."""
+
+from collections.abc import Callable
+from typing import Any
+
 from django_statsd import middleware, utils
 
 try:
     from celery import signals
     from celery.utils import dispatch
+except ImportError:  # pragma: no cover
+    signals = None  # type: ignore[assignment]
+    dispatch = None  # type: ignore[assignment]
 
-    counter = utils.get_counter('celery.status')
 
-    def increment(signal):
-        counter.increment(signal)
+if signals is not None:
+    counter = utils.get_counter("celery.status")
 
-        def _increment(**kwargs):
-            pass
+    def _make_increment(signal_name: str) -> Callable[..., None]:
+        def _increment(**kwargs: Any) -> None:
+            counter.increment(signal_name)
+
         return _increment
 
-    for signal in dir(signals):
-        instance = getattr(signals, signal)
-        if isinstance(instance, dispatch.Signal):
-            instance.connect(increment(signal))
+    for _signal_name in dir(signals):
+        _instance = getattr(signals, _signal_name)
+        if isinstance(_instance, dispatch.Signal):
+            # weak=False: the receiver is a closure that would otherwise
+            # be garbage collected immediately and never fire.
+            _instance.connect(_make_increment(_signal_name), weak=False)
 
-    def start(**kwargs):
-        middleware.StatsdMiddleware.start('celery')
+    def start(**kwargs: Any) -> None:
+        middleware.StatsdMiddleware.start("celery")
 
-    def stop(**kwargs):
-        middleware.StatsdMiddleware.stop(kwargs.get('task').name)
+    def stop(task: Any = None, **kwargs: Any) -> None:
+        if task is not None:
+            middleware.StatsdMiddleware.stop(task.name)
         middleware.StatsdMiddleware.scope.timings = None
 
-    def clear(**kwargs):
+    def clear(**kwargs: Any) -> None:
         middleware.StatsdMiddleware.scope.timings = None
 
     signals.task_prerun.connect(start)
     signals.task_postrun.connect(stop)
     signals.task_failure.connect(clear)
-
-except ImportError:
-    pass
