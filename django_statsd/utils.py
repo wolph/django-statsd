@@ -1,8 +1,18 @@
+"""Helpers to build python-statsd connections and clients."""
+
+from typing import Any
+
 import statsd
-from . import settings
+
+from django_statsd import settings
 
 
-def get_connection(host=None, port=None, sample_rate=None, disabled=None):
+def get_connection(
+    host: str | None = None,
+    port: int | None = None,
+    sample_rate: float | None = None,
+    disabled: bool | None = None,
+) -> Any:
     if not host:
         host = settings.STATSD_HOST
 
@@ -18,16 +28,20 @@ def get_connection(host=None, port=None, sample_rate=None, disabled=None):
     return statsd.Connection(host, port, sample_rate, disabled)
 
 
-def get_client(name, connection=None, class_=statsd.Client):
+def get_client(
+    name: str,
+    connection: Any = None,
+    class_: type[Any] = statsd.Client,
+) -> Any:
     if not connection:
         connection = get_connection()
 
     return class_(name, connection)
 
 
-def get_timer(name, connection=None):
+def get_timer(name: str, connection: Any = None) -> Any:
     return get_client(name, connection, statsd.Timer)
 
 
-def get_counter(name, connection=None):
+def get_counter(name: str, connection: Any = None) -> Any:
     return get_client(name, connection, statsd.Counter)

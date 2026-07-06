@@ -17,6 +17,12 @@ def test_client_prefix_filters_empty_parts(sent: list) -> None:
     assert client.get_client(None, "x").name == "prefix.c.x"
 
 
+def test_client_without_global_prefix(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setattr(statsd_settings, "STATSD_PREFIX", None)
+    client = middleware.Client("solo")
+    assert client.prefix == "solo"
+
+
 def test_counter_submit_skips_zero(sent: list) -> None:
     counter = middleware.Counter("c")
     counter.increment("a")
@@ -57,6 +63,16 @@ def test_with_timer_context(sent: list) -> None:
     with timer("inner"):
         pass
     assert "inner" in timer.data
+
+
+def test_timer_submit_ignores_unstopped_when_debug_disabled(
+    sent: list,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setattr(statsd_settings, "STATSD_DEBUG", False)
+    timer = middleware.Timer("t")
+    timer.start("never_stopped")
+    timer.submit()  # must not raise even though "never_stopped" was never stopped
 
 
 def test_module_helpers_with_scope(sent: list) -> None:

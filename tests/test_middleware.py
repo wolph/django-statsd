@@ -2,7 +2,7 @@ from typing import Any
 
 import pytest
 from asgiref.sync import async_to_sync
-from django.http import HttpRequest
+from django.http import HttpRequest, HttpResponse
 from django.test import AsyncClient
 
 from django_statsd import middleware
@@ -104,3 +104,76 @@ def test_process_view_callable_class() -> None:
         middleware.StatsdMiddleware.scope.view_name
         == "tests.test_middleware.CallableView"
     )
+
+
+def test_stop_with_partial_scope() -> None:
+    middleware.StatsdMiddleware.start()
+    middleware.StatsdMiddleware.scope.counter = None
+    middleware.StatsdMiddleware.scope.counter_site = None
+    middleware.StatsdMiddleware.stop()  # must not raise
+
+
+def test_process_request_without_track_middleware(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setattr(statsd_settings, "STATSD_TRACK_MIDDLEWARE", False)
+    mw = middleware.StatsdMiddleware(lambda request: None)  # type: ignore[arg-type,return-value]
+    request = HttpRequest()
+    mw.process_request(request)
+    assert "process_request" not in middleware.StatsdMiddleware.scope.timings.starts
+
+
+def test_process_view_without_timings() -> None:
+    mw = middleware.StatsdMiddleware(lambda request: None)  # type: ignore[arg-type,return-value]
+
+    def dummy_view(request: HttpRequest) -> None:
+        return None
+
+    mw.process_view(HttpRequest(), dummy_view, (), {})
+    assert (
+        middleware.StatsdMiddleware.scope.view_name
+        == "tests.test_middleware.dummy_view"
+    )
+
+
+def test_process_response_without_scope() -> None:
+    mw = middleware.StatsdMiddleware(lambda request: None)  # type: ignore[arg-type,return-value]
+    request = HttpRequest()
+    request.method = "GET"
+    response = HttpResponse()
+    assert mw.process_response(request, response) is response
+
+
+def test_process_response_tags_like_without_view_name(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setattr(middleware, "MAKE_TAGS_LIKE", "_is_")
+    mw = middleware.StatsdMiddleware(lambda request: None)  # type: ignore[arg-type,return-value]
+    request = HttpRequest()
+    request.method = "GET"
+    response = HttpResponse()
+    assert mw.process_response(request, response) is response
+
+
+def test_process_template_response_without_scope() -> None:
+    mw = middleware.StatsdMiddleware(lambda request: None)  # type: ignore[arg-type,return-value]
+    request = HttpRequest()
+    response = HttpResponse()
+    assert mw.process_template_response(request, response) is response
+
+
+def test_middleware_timer_noop_when_track_disabled(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setattr(statsd_settings, "STATSD_TRACK_MIDDLEWARE", False)
+    assert middleware.StatsdMiddlewareTimer._timings() is None
+
+    timer_mw = middleware.StatsdMiddlewareTimer(lambda request: HttpResponse())
+    request = HttpRequest()
+    response = HttpResponse()
+
+    timer_mw.process_request(request)  # no-op
+    timer_mw.process_view(request, lambda r: None, (), {})  # no-op
+    assert timer_mw.process_response(request, response) is response
+    timer_mw.process_exception(request, ValueError("x"))  # no-op
+    assert timer_mw.process_template_response(request, response) is response
