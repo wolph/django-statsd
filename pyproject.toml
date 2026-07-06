@@ -76,6 +76,7 @@ module-name = "django_statsd"
 [tool.pytest.ini_options]
 DJANGO_SETTINGS_MODULE = "tests.settings"
 testpaths = ["tests"]
+pythonpath = ["."]
 addopts = [
     "--cov=django_statsd",
     "--cov-report=term-missing",
