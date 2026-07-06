@@ -1,113 +1,130 @@
-from __future__ import with_statement
+"""Statsd middleware tracking view, middleware and database timings."""
 
 import collections
 import functools
 import logging
 import re
-import threading
 import time
 import warnings
+from collections.abc import Callable
+from contextlib import ExitStack
+from types import TracebackType
+from typing import Any, ClassVar, ParamSpec, TypeVar
 
 import statsd
-from django.core import exceptions
+from asgiref.local import Local
+from django.db import connections
+from django.http import HttpRequest
+from django.http.response import HttpResponseBase
 
-from . import settings, utils
+from django_statsd import settings, utils
 
-logger = logging.getLogger(__name__)
+logger: logging.Logger = logging.getLogger(__name__)
 
-TAGS_LIKE_SUPPORTED = ['=', '_is_']
-try:
-    MAKE_TAGS_LIKE = settings.STATSD_TAGS_LIKE
-    if MAKE_TAGS_LIKE is not None:
-        if MAKE_TAGS_LIKE is True:
-            MAKE_TAGS_LIKE = '_is_'
-        elif MAKE_TAGS_LIKE not in TAGS_LIKE_SUPPORTED:
-            MAKE_TAGS_LIKE = False
-            warnings.warn(
-                'Unsupported `STATSD_TAGS_LIKE` setting. '
-                'Please, choose from %r' % TAGS_LIKE_SUPPORTED
-            )
+P = ParamSpec("P")
+T = TypeVar("T")
 
-except exceptions.ImproperlyConfigured:
-    MAKE_TAGS_LIKE = False
+GetResponse = Callable[[HttpRequest], HttpResponseBase]
+
+TAGS_LIKE_SUPPORTED: tuple[str, ...] = ("=", "_is_")
 
 
-def is_ajax(request):
-    '''
-    Recreating the old Django is_ajax function. Note that this is not
-    guaranteed to be correct as it depends on jQuery style ajax
-    requests
-    '''
-    return request.headers.get('x-requested-with') == 'XMLHttpRequest'
+def _get_tags_like() -> str | None:
+    """Validate ``STATSD_TAGS_LIKE`` into a separator or ``None``."""
+    tags_like = settings.STATSD_TAGS_LIKE
+    if tags_like is None:
+        return None
+    if tags_like is True:
+        return "_is_"
+    if tags_like in TAGS_LIKE_SUPPORTED:
+        return str(tags_like)
+
+    warnings.warn(
+        "Unsupported `STATSD_TAGS_LIKE` setting. "
+        f"Please, choose from {TAGS_LIKE_SUPPORTED!r}",
+        stacklevel=2,
+    )
+    return None
 
 
-class WithTimer(object):
+MAKE_TAGS_LIKE: str | None = _get_tags_like()
 
-    def __init__(self, timer, key):
+
+def is_ajax(request: HttpRequest) -> bool:
+    """Recreate the old Django ``is_ajax`` check (jQuery-style ajax)."""
+    return request.headers.get("x-requested-with") == "XMLHttpRequest"
+
+
+class WithTimer:
+    def __init__(self, timer: "Timer", key: str) -> None:
         self.timer = timer
         self.key = key
 
-    def __enter__(self):
+    def __enter__(self) -> None:
         self.timer.start(self.key)
 
     def __exit__(
-            self,
-            type_,
-            value,
-            traceback,
-    ):
+        self,
+        type_: type[BaseException] | None,
+        value: BaseException | None,
+        traceback: TracebackType | None,
+    ) -> None:
         self.timer.stop(self.key)
 
 
-class Client(object):
-    class_ = statsd.Client
+class Client:
+    class_: ClassVar[type[Any]] = statsd.Client
 
-    def __init__(self, prefix='view'):
+    def __init__(self, prefix: str = "view") -> None:
         if settings.STATSD_PREFIX:
-            prefix = '%s.%s' % (settings.STATSD_PREFIX, prefix)
-        self.prefix = prefix
-        self.data = collections.defaultdict(int)
+            prefix = f"{settings.STATSD_PREFIX}.{prefix}"
+        self.prefix: str = prefix
 
-    def get_client(self, *args):
-        args = [self.prefix] + list(args)
-        prefix = '.'.join(a for a in args if a)
+    def get_client(self, *args: str | None) -> Any:
+        prefix = ".".join(a for a in (self.prefix, *args) if a)
         return utils.get_client(prefix, class_=self.class_)
 
-    def submit(self, *args):
-        raise NotImplementedError(
-            'Subclasses must define a `submit` function')
+    def submit(self, *args: str | None) -> None:
+        raise NotImplementedError("Subclasses must define a `submit` function")
 
 
 class Counter(Client):
-    class_ = statsd.Counter
+    class_: ClassVar[type[Any]] = statsd.Counter
 
-    def increment(self, key, delta=1):
+    def __init__(self, prefix: str = "view") -> None:
+        super().__init__(prefix)
+        self.data: collections.defaultdict[str, int] = collections.defaultdict(int)
+
+    def increment(self, key: str, delta: int = 1) -> None:
         self.data[key] += delta
 
-    def decrement(self, key, delta=1):
+    def decrement(self, key: str, delta: int = 1) -> None:
         self.data[key] -= delta
 
-    def submit(self, *args):
+    def submit(self, *args: str | None) -> None:
         client = self.get_client(*args)
-        for k, v in self.data.items():
-            if v:
-                client.increment(k, v)
+        for key, value in self.data.items():
+            if value:
+                client.increment(key, value)
 
 
 class Timer(Client):
-    class_ = statsd.Timer
+    class_: ClassVar[type[Any]] = statsd.Timer
 
-    def __init__(self, prefix='view'):
-        Client.__init__(self, prefix)
-        self.starts = collections.defaultdict(collections.deque)
-        self.data = collections.defaultdict(float)
+    def __init__(self, prefix: str = "view") -> None:
+        super().__init__(prefix)
+        self.starts: collections.defaultdict[str, collections.deque[float]] = (
+            collections.defaultdict(collections.deque)
+        )
+        self.data: collections.defaultdict[str, float] = collections.defaultdict(float)
 
-    def start(self, key):
+    def start(self, key: str) -> None:
         self.starts[key].append(time.time())
 
-    def stop(self, key):
-        assert self.starts[key], ('Unable to stop tracking %s, never '
-                                  'started tracking it' % key)
+    def stop(self, key: str) -> float:
+        assert self.starts[key], (
+            f"Unable to stop tracking {key}, never started tracking it"
+        )
 
         delta = time.time() - self.starts[key].pop()
         # Clean up when we're done
@@ -117,221 +134,316 @@ class Timer(Client):
         self.data[key] += delta
         return delta
 
-    def submit(self, *args):
+    def submit(self, *args: str | None) -> None:
         client = self.get_client(*args)
-        for k in list(self.data.keys()):
-            client.send(k, self.data.pop(k))
+        for key in list(self.data.keys()):
+            client.send(key, self.data.pop(key))
 
         if settings.STATSD_DEBUG:
-            assert not self.starts, ('Timer(s) %r were started but never '
-                                     'stopped' % self.starts)
+            assert not self.starts, (
+                f"Timer(s) {dict(self.starts)!r} were started but never stopped"
+            )
 
-    def __call__(self, key):
+    def __call__(self, key: str) -> WithTimer:
         return WithTimer(self, key)
 
 
 class StatsdMiddleware:
-    scope = threading.local()
+    scope: ClassVar[Local] = Local()
 
-    def __init__(self, get_response=None):
+    def __init__(self, get_response: GetResponse) -> None:
         self.get_response = get_response
-        self.scope.timings = None
-        self.scope.counter = None
 
-    def __call__(self, request):
-        # store the timings in the request so it can be used everywhere
+    def __call__(self, request: HttpRequest) -> HttpResponseBase:
+        # Store the timings in the request so it can be used everywhere
         self.process_request(request)
         try:
-            return self.process_response(request, self.get_response(request))
+            with ExitStack() as stack:
+                if settings.STATSD_TRACK_DATABASE:
+                    # Imported here to avoid a circular import at load
+                    # time: database.py needs this module's helpers.
+                    from django_statsd import database
+
+                    for alias in connections:
+                        stack.enter_context(
+                            connections[alias].execute_wrapper(
+                                database.statsd_execute_wrapper(alias)
+                            )
+                        )
+                response = self.get_response(request)
+            return self.process_response(request, response)
         finally:
             self.cleanup(request)
 
     @classmethod
-    def skip_view(cls, view_name):
+    def _scope_get(cls, name: str) -> Any:
+        return getattr(cls.scope, name, None)
+
+    @classmethod
+    def skip_view(cls, view_name: str) -> bool:
         for pattern in settings.STATSD_VIEWS_TO_SKIP:
             if re.match(pattern, view_name):
-                logger.debug("Skipping metric `{}`".format(view_name))
+                logger.debug("Skipping metric `%s`", view_name)
                 return True
 
         return False
 
     @classmethod
-    def start(cls, prefix='view'):
+    def start(cls, prefix: str = "view") -> Local:
         cls.scope.timings = Timer(prefix)
-        cls.scope.timings.start('total')
+        cls.scope.timings.start("total")
         cls.scope.counter = Counter(prefix)
-        cls.scope.counter.increment('hit')
+        cls.scope.counter.increment("hit")
         cls.scope.counter_codes = Counter(prefix)
-        cls.scope.counter_codes.increment('hit')
+        cls.scope.counter_codes.increment("hit")
         cls.scope.counter_site = Counter(prefix)
-        cls.scope.counter_site.increment('hit')
+        cls.scope.counter_site.increment("hit")
+        cls.scope.view_name = None
         return cls.scope
 
     @classmethod
-    def stop(cls, *key):
-        if getattr(cls.scope, 'timings', None):
-            cls.scope.timings.stop('total')
-            cls.scope.timings.submit(*key)
-            cls.scope.counter.submit(*key)
-            cls.scope.counter_site.submit('site')
+    def stop(cls, *key: str) -> None:
+        timings: Timer | None = cls._scope_get("timings")
+        if not timings:
+            return
 
-    def process_request(self, request):
-        # store the timings in the request so it can be used everywhere
-        request.statsd = self.start()
-        if settings.STATSD_TRACK_MIDDLEWARE:
-            self.scope.timings.start('process_request')
-        self.view_name = None
+        timings.stop("total")
+        timings.submit(*key)
+        counter: Counter | None = cls._scope_get("counter")
+        if counter:
+            counter.submit(*key)
+        counter_site: Counter | None = cls._scope_get("counter_site")
+        if counter_site:
+            counter_site.submit("site")
 
-    def process_view(self, request, view_func, view_args, view_kwargs):
+    def process_request(self, request: HttpRequest) -> None:
+        request.statsd = self.start()  # type: ignore[attr-defined]
         if settings.STATSD_TRACK_MIDDLEWARE:
-            StatsdMiddleware.scope.timings.start('process_view')
+            self.scope.timings.start("process_request")
+
+    def process_view(
+        self,
+        request: HttpRequest,
+        view_func: Callable[..., HttpResponseBase],
+        view_args: tuple[Any, ...],
+        view_kwargs: dict[str, Any],
+    ) -> None:
+        timings: Timer | None = self._scope_get("timings")
+        if settings.STATSD_TRACK_MIDDLEWARE and timings:
+            timings.start("process_view")
 
         # View name is defined as module.view
         # (e.g. django.contrib.auth.views.login)
-        self.view_name = view_func.__module__
+        view_name = view_func.__module__
 
-        # CBV specific
-        if hasattr(view_func, '__name__'):
-            self.view_name = '%s.%s' % (self.view_name, view_func.__name__)
-        elif hasattr(view_func, '__class__'):
-            self.view_name = '%s.%s' % (
-                self.view_name, view_func.__class__.__name__)
+        # CBV and callable-instance specific
+        if hasattr(view_func, "__name__"):
+            view_name = f"{view_name}.{view_func.__name__}"
+        else:
+            view_name = f"{view_name}.{view_func.__class__.__name__}"
 
         if MAKE_TAGS_LIKE:
-            self.view_name = self.view_name.replace('.', '_')
-            self.view_name = 'view' + MAKE_TAGS_LIKE + self.view_name
+            view_name = view_name.replace(".", "_")
+            view_name = f"view{MAKE_TAGS_LIKE}{view_name}"
 
-    def process_response(self, request, response):
-        if self.view_name and self.__class__.skip_view(self.view_name):
+        self.scope.view_name = view_name
+
+    def process_response(
+        self,
+        request: HttpRequest,
+        response: HttpResponseBase,
+    ) -> HttpResponseBase:
+        view_name: str | None = self._scope_get("view_name")
+        if view_name and self.skip_view(view_name):
             return response
 
-        self.scope.counter_codes.increment(
-            f'{str(response.status_code // 100)}xx')
-        self.scope.counter_codes.submit('http_codes')
+        counter_codes: Counter | None = self._scope_get("counter_codes")
+        if counter_codes:
+            counter_codes.increment(f"{response.status_code // 100}xx")
+            counter_codes.submit("http_codes")
 
-        if settings.STATSD_TRACK_MIDDLEWARE:
-            StatsdMiddleware.scope.timings.stop('process_response')
+        timings: Timer | None = self._scope_get("timings")
+        if settings.STATSD_TRACK_MIDDLEWARE and timings:
+            timings.stop("process_response")
+
+        method = (request.method or "get").lower()
         if MAKE_TAGS_LIKE:
-            method = f'method{MAKE_TAGS_LIKE}'
-            method += request.method.lower().replace('.', '_')
-
-            is_ajax_ = f'is_ajax_{MAKE_TAGS_LIKE}'
-            is_ajax_ += str(is_ajax(request)).lower()
-
-            if getattr(self, 'view_name', None):
-                self.stop(method, self.view_name, is_ajax_)
+            tag_method = f"method{MAKE_TAGS_LIKE}{method.replace('.', '_')}"
+            ajax = f"is_ajax_{MAKE_TAGS_LIKE}{str(is_ajax(request)).lower()}"
+            if view_name:
+                self.stop(tag_method, view_name, ajax)
         else:
-            method = request.method.lower()
             if is_ajax(request):
-                method += '_ajax'
-            if getattr(self, 'view_name', None):
-                self.stop(method, self.view_name)
+                method += "_ajax"
+            if view_name:
+                self.stop(method, view_name)
+
         self.cleanup(request)
         return response
 
-    def process_exception(self, request, exception):
-        if settings.STATSD_TRACK_MIDDLEWARE:
-            StatsdMiddleware.scope.timings.stop('process_exception')
-        self.scope.counter_codes.increment('5xx')
-        self.scope.counter_codes.submit('http_codes')
+    def process_exception(
+        self,
+        request: HttpRequest,
+        exception: BaseException,
+    ) -> None:
+        timings: Timer | None = self._scope_get("timings")
+        if settings.STATSD_TRACK_MIDDLEWARE and timings:
+            timings.stop("process_exception")
 
-    def process_template_response(self, request, response):
-        if settings.STATSD_TRACK_MIDDLEWARE:
-            StatsdMiddleware.scope.timings.stop('process_template_response')
+        counter_codes: Counter | None = self._scope_get("counter_codes")
+        if counter_codes:
+            counter_codes.increment("5xx")
+            counter_codes.submit("http_codes")
+
+    def process_template_response(
+        self,
+        request: HttpRequest,
+        response: HttpResponseBase,
+    ) -> HttpResponseBase:
+        timings: Timer | None = self._scope_get("timings")
+        if settings.STATSD_TRACK_MIDDLEWARE and timings:
+            timings.stop("process_template_response")
         return response
 
-    def cleanup(self, request):
+    def cleanup(self, request: HttpRequest) -> None:
         self.scope.timings = None
         self.scope.counter = None
-        self.view_name = None
-        request.statsd = None
+        self.scope.counter_codes = None
+        self.scope.counter_site = None
+        self.scope.view_name = None
+        request.statsd = None  # type: ignore[attr-defined]
 
 
 class StatsdMiddlewareTimer:
-
-    def __init__(self, get_response):
+    def __init__(self, get_response: GetResponse) -> None:
         self.get_response = get_response
 
-    def __call__(self, request):
+    def __call__(self, request: HttpRequest) -> HttpResponseBase:
         self.process_request(request)
         return self.process_response(request, self.get_response(request))
 
-    def process_request(self, request):
+    @staticmethod
+    def _timings() -> Timer | None:
         if settings.STATSD_TRACK_MIDDLEWARE:
-            StatsdMiddleware.scope.timings.stop('process_request')
+            return getattr(StatsdMiddleware.scope, "timings", None)
+        return None
 
-    def process_view(self, request, view_func, view_args, view_kwargs):
-        if settings.STATSD_TRACK_MIDDLEWARE:
-            StatsdMiddleware.scope.timings.stop('process_view')
+    def process_request(self, request: HttpRequest) -> None:
+        timings = self._timings()
+        if timings:
+            timings.stop("process_request")
 
-    def process_response(self, request, response):
-        if settings.STATSD_TRACK_MIDDLEWARE:
-            StatsdMiddleware.scope.timings.start('process_response')
+    def process_view(
+        self,
+        request: HttpRequest,
+        view_func: Callable[..., HttpResponseBase],
+        view_args: tuple[Any, ...],
+        view_kwargs: dict[str, Any],
+    ) -> None:
+        timings = self._timings()
+        if timings:
+            timings.stop("process_view")
+
+    def process_response(
+        self,
+        request: HttpRequest,
+        response: HttpResponseBase,
+    ) -> HttpResponseBase:
+        timings = self._timings()
+        if timings:
+            timings.start("process_response")
         return response
 
-    def process_exception(self, request, exception):
-        if settings.STATSD_TRACK_MIDDLEWARE:
-            StatsdMiddleware.scope.timings.start('process_exception')
+    def process_exception(
+        self,
+        request: HttpRequest,
+        exception: BaseException,
+    ) -> None:
+        timings = self._timings()
+        if timings:
+            timings.start("process_exception")
 
-    def process_template_response(self, request, response):
-        if settings.STATSD_TRACK_MIDDLEWARE:
-            StatsdMiddleware.scope.timings.start('process_template_response')
+    def process_template_response(
+        self,
+        request: HttpRequest,
+        response: HttpResponseBase,
+    ) -> HttpResponseBase:
+        timings = self._timings()
+        if timings:
+            timings.start("process_template_response")
         return response
 
 
-class DummyWith(object):
-
-    def __enter__(self):
+class DummyWith:
+    def __enter__(self) -> None:
         pass
 
-    def __exit__(self, type_, value, traceback):
+    def __exit__(
+        self,
+        type_: type[BaseException] | None,
+        value: BaseException | None,
+        traceback: TracebackType | None,
+    ) -> None:
         pass
 
 
-def start(key):
-    if getattr(StatsdMiddleware.scope, 'timings', None):
-        StatsdMiddleware.scope.timings.start(key)
+def _timings() -> Timer | None:
+    return getattr(StatsdMiddleware.scope, "timings", None)
 
 
-def stop(key):
-    if getattr(StatsdMiddleware.scope, 'timings', None):
-        return StatsdMiddleware.scope.timings.stop(key)
+def _counter() -> Counter | None:
+    return getattr(StatsdMiddleware.scope, "counter", None)
 
 
-def with_(key):
-    if getattr(StatsdMiddleware.scope, 'timings', None):
-        return StatsdMiddleware.scope.timings(key)
-    else:
-        return DummyWith()
+def start(key: str) -> None:
+    timings = _timings()
+    if timings:
+        timings.start(key)
 
 
-def incr(key, value=1):
-    if getattr(StatsdMiddleware.scope, 'counter', None):
-        StatsdMiddleware.scope.counter.increment(key, value)
+def stop(key: str) -> float | None:
+    timings = _timings()
+    if timings:
+        return timings.stop(key)
+    return None
 
 
-def decr(key, value=1):
-    if getattr(StatsdMiddleware.scope, 'counter', None):
-        StatsdMiddleware.scope.counter.decrement(key, value)
+def with_(key: str) -> WithTimer | DummyWith:
+    timings = _timings()
+    if timings:
+        return timings(key)
+    return DummyWith()
 
 
-def wrapper(prefix, f):
+def incr(key: str, value: int = 1) -> None:
+    counter = _counter()
+    if counter:
+        counter.increment(key, value)
+
+
+def decr(key: str, value: int = 1) -> None:
+    counter = _counter()
+    if counter:
+        counter.decrement(key, value)
+
+
+def wrapper(prefix: str, f: Callable[P, T]) -> Callable[P, T]:
     @functools.wraps(f)
-    def _wrapper(*args, **kwargs):
-        with with_('%s.%s' % (prefix, f.__name__.lower())):
+    def _wrapper(*args: P.args, **kwargs: P.kwargs) -> T:
+        with with_(f"{prefix}.{f.__name__.lower()}"):
             return f(*args, **kwargs)
 
     return _wrapper
 
 
-def named_wrapper(name, f):
+def named_wrapper(name: str, f: Callable[P, T]) -> Callable[P, T]:
     @functools.wraps(f)
-    def _wrapper(*args, **kwargs):
+    def _wrapper(*args: P.args, **kwargs: P.kwargs) -> T:
         with with_(name):
             return f(*args, **kwargs)
 
     return _wrapper
 
 
-def decorator(prefix):
-    return lambda f: wrapper(prefix, f)
+def decorator(prefix: str) -> Callable[[Callable[P, T]], Callable[P, T]]:
+    return functools.partial(wrapper, prefix)
