@@ -85,3 +85,41 @@ addopts = [
 [tool.coverage.run]
 branch = true
 source = ["django_statsd"]
+
+[tool.mypy]
+packages = ["django_statsd"]
+plugins = ["mypy_django_plugin.main"]
+strict = true
+local_partial_types = true
+enable_error_code = [
+    "exhaustive-match",
+    "ignore-without-code",
+    "redundant-expr",
+    "truthy-bool",
+]
+warn_return_any = false
+
+[tool.django-stubs]
+django_settings_module = "tests.settings"
+
+[[tool.mypy.overrides]]
+module = ["statsd.*", "celery.*"]
+ignore_missing_imports = true
+
+[tool.pyright]
+pythonPlatform = "All"
+include = ["django_statsd"]
+ignore = [".venv"]
+typeCheckingMode = "strict"
+# python-statsd and celery ship no type information; silence the unknown-
+# type fallout instead of writing stubs for them.
+reportMissingTypeStubs = false
+reportUnknownArgumentType = false
+reportUnknownMemberType = false
+reportUnknownVariableType = false
+# request.statsd is a documented dynamic attribute set by the middleware.
+reportAttributeAccessIssue = false
+
+[tool.pyrefly]
+project-includes = ["django_statsd"]
+ignore-missing-imports = ["statsd", "celery", "celery.*"]

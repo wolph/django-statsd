@@ -10,11 +10,15 @@ try:
 
     from celery import signals
 except ImportError:  # pragma: no cover
-    signals = None  # type: ignore[assignment]
-    dispatch = None  # type: ignore[assignment]
+    # celery ships no type information (see [[tool.mypy.overrides]]),
+    # so `signals`/`dispatch` are already typed `Any` for mypy and
+    # reassigning `None` here needs no ignore there. ty resolves the
+    # real celery submodules instead, so it needs its own suppression.
+    signals = None  # ty: ignore[invalid-assignment]
+    dispatch = None  # ty: ignore[invalid-assignment]
 
 
-if signals is not None:
+if signals is not None and dispatch is not None:
     counter = utils.get_counter('celery.status')
 
     def _make_increment(signal_name: str) -> Callable[..., None]:

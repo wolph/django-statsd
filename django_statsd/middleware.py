@@ -222,7 +222,10 @@ class StatsdMiddleware:
             counter_site.submit('site')
 
     def process_request(self, request: HttpRequest) -> None:
-        request.statsd = self.start()  # type: ignore[attr-defined]
+        # request.statsd is a documented dynamic attribute (see
+        # docs/django_statsd.rst) set by this middleware; neither
+        # django-stubs nor ty know about it.
+        request.statsd = self.start()  # type: ignore[attr-defined]  # ty: ignore[unresolved-attribute]
         if settings.STATSD_TRACK_MIDDLEWARE:
             self.scope.timings.start('process_request')
 
@@ -316,7 +319,7 @@ class StatsdMiddleware:
         self.scope.counter_codes = None
         self.scope.counter_site = None
         self.scope.view_name = None
-        request.statsd = None  # type: ignore[attr-defined]
+        request.statsd = None  # type: ignore[attr-defined]  # ty: ignore[unresolved-attribute]
 
 
 class StatsdMiddlewareTimer:
@@ -433,9 +436,14 @@ def decr(key: str, value: int = 1) -> None:
 
 
 def wrapper(prefix: str, f: Callable[P, T]) -> Callable[P, T]:
+    # Not every Callable exposes __name__ (e.g. functools.partial or a
+    # callable instance), so fall back to the type name instead of
+    # assuming a plain function.
+    name = getattr(f, '__name__', type(f).__name__)
+
     @functools.wraps(f)
     def _wrapper(*args: P.args, **kwargs: P.kwargs) -> T:
-        with with_(f'{prefix}.{f.__name__.lower()}'):
+        with with_(f'{prefix}.{name.lower()}'):
             return f(*args, **kwargs)
 
     return _wrapper
