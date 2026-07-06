@@ -65,14 +65,6 @@ django_statsd Package
     :undoc-members:
     :show-inheritance:
 
-:mod:`urls` Module
-------------------
-
-.. automodule:: django_statsd.urls
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
 :mod:`utils` Module
 -------------------
 

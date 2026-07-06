@@ -6,7 +6,7 @@ build-backend = "uv_build"
 name = "django-statsd"
 version = "3.0.0"
 description = "Django app that submits query and view durations to statsd."
-readme = "README.rst"
+readme = "README.md"
 license = "BSD-3-Clause"
 license-files = ["LICENSE"]
 requires-python = ">=3.10"

@@ -1,5 +1,5 @@
-Django Statsd Client
-=========================================
+django-statsd
+=============
 
 Contents:
 
@@ -7,7 +7,6 @@ Contents:
    :maxdepth: 2
 
    usage
-
    django_statsd
 
 Indices and tables
@@ -15,4 +14,3 @@ Indices and tables
 
 * :ref:`genindex`
 * :ref:`search`
-
