@@ -1,20 +1,24 @@
-from __future__ import absolute_import
-import django_statsd
+"""Patch :class:`redis.Redis` to time commands as ``redis.<command>``."""
+
+from typing import Any
+
+from django_statsd import middleware
 
 try:
     import redis
+except ImportError:  # pragma: no cover
+    redis = None  # type: ignore[assignment]
 
-    class StatsdRedis(redis.Redis):
 
-        def execute_command(self, func_name, *args, **kwargs):
-            with django_statsd.with_('redis.%s' % func_name.lower()):
-                return origRedis.execute_command(self, func_name, *args,
-                                                 **kwargs)
+if redis is not None and not getattr(redis.Redis, "statsd_patched", False):
+    _original_redis = redis.Redis
 
-    origRedis = None
-    # NOTE issubclass is true if both are the same class
-    if not issubclass(redis.Redis, StatsdRedis):
-        origRedis = redis.Redis
-        redis.Redis = StatsdRedis
-except ImportError:
-    pass
+    class StatsdRedis(_original_redis):  # type: ignore[misc,valid-type]
+        statsd_patched = True
+
+        def execute_command(self, *args: Any, **kwargs: Any) -> Any:
+            name = str(args[0]).lower() if args else "unknown"
+            with middleware.with_(f"redis.{name}"):
+                return super().execute_command(*args, **kwargs)
+
+    redis.Redis = StatsdRedis  # type: ignore[misc]

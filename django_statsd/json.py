@@ -1,24 +1,12 @@
-from __future__ import absolute_import
-import django_statsd
+"""Time stdlib :mod:`json` calls as ``json.<function>`` metrics."""
 
-try:
-    import json
+import json
 
-    if not hasattr(json, 'statsd_patched'):
-        json.statsd_patched = True
-        json.load = django_statsd.wrapper('json', json.load)
-        json.loads = django_statsd.wrapper('json', json.loads)
-        json.dump = django_statsd.wrapper('json', json.dump)
-        json.dumps = django_statsd.wrapper('json', json.dumps)
-except ImportError:
-    pass
+from django_statsd import middleware
 
-try:
-    import cjson
-
-    if not hasattr(json, 'statsd_patched'):
-        cjson.statsd_patched = True
-        cjson.encode = django_statsd.wrapper('cjson', cjson.encode)
-        cjson.decode = django_statsd.wrapper('cjson', cjson.decode)
-except ImportError:
-    pass
+if not hasattr(json, "statsd_patched"):
+    json.statsd_patched = True  # type: ignore[attr-defined]
+    json.load = middleware.wrapper("json", json.load)
+    json.loads = middleware.wrapper("json", json.loads)
+    json.dump = middleware.wrapper("json", json.dump)
+    json.dumps = middleware.wrapper("json", json.dumps)
