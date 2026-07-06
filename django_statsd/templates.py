@@ -4,8 +4,8 @@ from django.template import loader
 
 from django_statsd import middleware
 
-if not hasattr(loader, "statsd_patched"):
+if not hasattr(loader, 'statsd_patched'):
     loader.statsd_patched = True  # type: ignore[attr-defined]
     loader.render_to_string = middleware.named_wrapper(
-        "render_django", loader.render_to_string
+        'render_django', loader.render_to_string
     )

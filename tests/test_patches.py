@@ -1,22 +1,24 @@
 import importlib
 import json
 
-import redis as redis_lib
 from django.template import loader
+from django_statsd import (
+    json as statsd_json,
+    middleware,
+    redis as statsd_redis,
+    templates as statsd_templates,
+)
 
-from django_statsd import middleware
-from django_statsd import json as statsd_json
-from django_statsd import redis as statsd_redis
-from django_statsd import templates as statsd_templates
+import redis as redis_lib
 
 
 def test_json_patched() -> None:
-    assert getattr(json, "statsd_patched", False)
+    assert getattr(json, 'statsd_patched', False)
     middleware.StatsdMiddleware.start()
-    assert json.dumps({"a": 1}) == '{"a": 1}'
-    assert json.loads('{"a": 1}') == {"a": 1}
-    assert "json.dumps" in middleware.StatsdMiddleware.scope.timings.data
-    assert "json.loads" in middleware.StatsdMiddleware.scope.timings.data
+    assert json.dumps({'a': 1}) == '{"a": 1}'
+    assert json.loads('{"a": 1}') == {'a': 1}
+    assert 'json.dumps' in middleware.StatsdMiddleware.scope.timings.data
+    assert 'json.loads' in middleware.StatsdMiddleware.scope.timings.data
 
 
 def test_json_reimport_does_not_double_patch() -> None:
@@ -26,11 +28,11 @@ def test_json_reimport_does_not_double_patch() -> None:
 
 
 def test_template_render_patched() -> None:
-    assert getattr(loader, "statsd_patched", False)
+    assert getattr(loader, 'statsd_patched', False)
     middleware.StatsdMiddleware.start()
-    result = loader.render_to_string("example.html", {"name": "x"})
-    assert "Hello x!" in result
-    assert "render_django" in middleware.StatsdMiddleware.scope.timings.data
+    result = loader.render_to_string('example.html', {'name': 'x'})
+    assert 'Hello x!' in result
+    assert 'render_django' in middleware.StatsdMiddleware.scope.timings.data
 
 
 def test_template_reimport_does_not_double_patch() -> None:
@@ -40,16 +42,16 @@ def test_template_reimport_does_not_double_patch() -> None:
 
 
 def test_redis_patched(monkeypatch) -> None:
-    assert getattr(redis_lib.Redis, "statsd_patched", False)
+    assert getattr(redis_lib.Redis, 'statsd_patched', False)
     monkeypatch.setattr(
         statsd_redis._original_redis,
-        "execute_command",
-        lambda self, *args, **kwargs: "PONG",
+        'execute_command',
+        lambda self, *args, **kwargs: 'PONG',
     )
     middleware.StatsdMiddleware.start()
     client = redis_lib.Redis()
-    assert client.execute_command("PING") == "PONG"
-    assert "redis.ping" in middleware.StatsdMiddleware.scope.timings.data
+    assert client.execute_command('PING') == 'PONG'
+    assert 'redis.ping' in middleware.StatsdMiddleware.scope.timings.data
 
 
 def test_redis_reimport_does_not_double_patch() -> None:
@@ -62,4 +64,4 @@ def test_urls_module_removed() -> None:
     import pytest
 
     with pytest.raises(ImportError):
-        importlib.import_module("django_statsd.urls")
+        importlib.import_module('django_statsd.urls')

@@ -1,0 +1,84 @@
+# Kept separate from pyproject.toml so it can be shared across projects
+
+target-version = 'py310'
+
+src = ['django_statsd']
+exclude = ['.tox', '.venv']
+
+line-length = 79
+
+[lint]
+ignore = [
+    'A001', # Variable {name} is shadowing a Python builtin
+    'A002', # Argument {name} is shadowing a Python builtin
+    'A003', # Class attribute {name} is shadowing a Python builtin
+    'B023', # function-uses-loop-variable
+    'COM812', # Missing trailing comma in a list
+    'D205', # blank-line-after-summary
+    'D212', # multi-line-summary-first-line
+    'ISC001', # String concatenation with implicit str conversion
+    'Q001', # Remove bad quotes
+    'Q002', # Remove bad quotes
+    'RET505', # Unnecessary `else` after `return` statement
+    'RET506', # Unnecessary `else` after `raise` statement
+    'RET507', # Unnecessary `elif` after `continue` statement
+    'SIM108', # Ternary operators are not always more readable
+    'SIM114', # Combine `if` branches using logical `or` operator
+    'TRY003', # Avoid specifying long messages outside the exception class
+]
+
+select = [
+    'A', # flake8-builtins
+    'ASYNC', # flake8 async checker
+    'B', # flake8-bugbear
+    'C4', # flake8-comprehensions
+    'C90', # mccabe
+    'COM', # flake8-commas
+    'DJ', # flake8-django
+    'E', # pycodestyle error ('W' for warning)
+    'F', # pyflakes
+    'FA', # flake8-future-annotations
+    'I', # isort
+    'ICN', # flake8-import-conventions
+    'INP', # flake8-no-pep420
+    'ISC', # flake8-implicit-str-concat
+    'N', # pep8-naming
+    'PERF', # perflint
+    'PIE', # flake8-pie
+    'Q', # flake8-quotes
+    'RET', # flake8-return
+    'RUF', # Ruff-specific rules
+    'SIM', # flake8-simplify
+    'T20', # flake8-print
+    'TD', # flake8-todos
+    'TRY', # tryceratops
+    'UP', # pyupgrade
+]
+
+[lint.per-file-ignores]
+'tests/*' = ['SIM115', 'SIM117', 'T201', 'B007', 'SLF001']
+'docs/*' = ['INP001', 'RUF012']
+
+[lint.isort]
+case-sensitive = true
+combine-as-imports = true
+force-wrap-aliases = true
+
+[lint.flake8-quotes]
+docstring-quotes = 'single'
+inline-quotes = 'single'
+multiline-quotes = 'single'
+
+[format]
+line-ending = 'lf'
+indent-style = 'space'
+quote-style = 'single'
+docstring-code-format = true
+skip-magic-trailing-comma = false
+exclude = ['__init__.py']
+
+[lint.pycodestyle]
+max-line-length = 79
+
+[lint.flake8-pytest-style]
+mark-parentheses = true

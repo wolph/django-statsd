@@ -6,15 +6,16 @@ from typing import Any
 from django_statsd import middleware, utils
 
 try:
-    from celery import signals
     from celery.utils import dispatch
+
+    from celery import signals
 except ImportError:  # pragma: no cover
     signals = None  # type: ignore[assignment]
     dispatch = None  # type: ignore[assignment]
 
 
 if signals is not None:
-    counter = utils.get_counter("celery.status")
+    counter = utils.get_counter('celery.status')
 
     def _make_increment(signal_name: str) -> Callable[..., None]:
         def _increment(**kwargs: Any) -> None:
@@ -30,7 +31,7 @@ if signals is not None:
             _instance.connect(_make_increment(_signal_name), weak=False)
 
     def start(**kwargs: Any) -> None:
-        middleware.StatsdMiddleware.start("celery")
+        middleware.StatsdMiddleware.start('celery')
 
     def stop(task: Any = None, **kwargs: Any) -> None:
         if task is not None:

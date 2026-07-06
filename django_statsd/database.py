@@ -27,7 +27,7 @@ def statsd_execute_wrapper(alias: str) -> ExecuteWrapper:
         many: bool,
         context: QueryContext,
     ) -> Any:
-        with middleware.with_(f"sql.{alias}"):
+        with middleware.with_(f'sql.{alias}'):
             return execute(sql, params, many, context)
 
     return timed_execute

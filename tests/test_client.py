@@ -1,9 +1,11 @@
 from typing import Any
 
 import pytest
+from django_statsd import (
+    middleware,
+    settings as statsd_settings,
+)
 
-from django_statsd import middleware
-from django_statsd import settings as statsd_settings
 from tests.conftest import metric_keys
 
 
@@ -13,106 +15,107 @@ def test_client_submit_not_implemented() -> None:
 
 
 def test_client_prefix_filters_empty_parts(sent: list) -> None:
-    client = middleware.Counter("c")
-    assert client.get_client(None, "x").name == "prefix.c.x"
+    client = middleware.Counter('c')
+    assert client.get_client(None, 'x').name == 'prefix.c.x'
 
 
 def test_client_without_global_prefix(monkeypatch: pytest.MonkeyPatch) -> None:
-    monkeypatch.setattr(statsd_settings, "STATSD_PREFIX", None)
-    client = middleware.Client("solo")
-    assert client.prefix == "solo"
+    monkeypatch.setattr(statsd_settings, 'STATSD_PREFIX', None)
+    client = middleware.Client('solo')
+    assert client.prefix == 'solo'
 
 
 def test_counter_submit_skips_zero(sent: list) -> None:
-    counter = middleware.Counter("c")
-    counter.increment("a")
-    counter.increment("b")
-    counter.decrement("b")
+    counter = middleware.Counter('c')
+    counter.increment('a')
+    counter.increment('b')
+    counter.decrement('b')
     counter.submit()
-    assert metric_keys(sent) == {"prefix.c.a"}
+    assert metric_keys(sent) == {'prefix.c.a'}
 
 
 def test_timer_nested_same_key() -> None:
-    timer = middleware.Timer("t")
-    timer.start("x")
-    timer.start("x")
-    assert timer.stop("x") >= 0
-    assert timer.stop("x") >= 0
-    assert "x" not in timer.starts
+    timer = middleware.Timer('t')
+    timer.start('x')
+    timer.start('x')
+    assert timer.stop('x') >= 0
+    assert timer.stop('x') >= 0
+    assert 'x' not in timer.starts
 
 
 def test_timer_stop_without_start() -> None:
-    timer = middleware.Timer("t")
-    with pytest.raises(AssertionError, match="never started"):
-        timer.stop("missing")
+    timer = middleware.Timer('t')
+    with pytest.raises(AssertionError, match='never started'):
+        timer.stop('missing')
 
 
 def test_timer_debug_detects_unstopped(
     sent: list,
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    monkeypatch.setattr(statsd_settings, "STATSD_DEBUG", True)
-    timer = middleware.Timer("t")
-    timer.start("x")
-    with pytest.raises(AssertionError, match="never"):
+    monkeypatch.setattr(statsd_settings, 'STATSD_DEBUG', True)
+    timer = middleware.Timer('t')
+    timer.start('x')
+    with pytest.raises(AssertionError, match='never'):
         timer.submit()
 
 
 def test_with_timer_context(sent: list) -> None:
-    timer = middleware.Timer("t")
-    with timer("inner"):
+    timer = middleware.Timer('t')
+    with timer('inner'):
         pass
-    assert "inner" in timer.data
+    assert 'inner' in timer.data
 
 
 def test_timer_submit_ignores_unstopped_when_debug_disabled(
     sent: list,
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    monkeypatch.setattr(statsd_settings, "STATSD_DEBUG", False)
-    timer = middleware.Timer("t")
-    timer.start("never_stopped")
-    timer.submit()  # must not raise even though "never_stopped" was never stopped
+    monkeypatch.setattr(statsd_settings, 'STATSD_DEBUG', False)
+    timer = middleware.Timer('t')
+    timer.start('never_stopped')
+    # must not raise even though "never_stopped" was never stopped
+    timer.submit()
 
 
 def test_module_helpers_with_scope(sent: list) -> None:
     middleware.StatsdMiddleware.start()
     scope = middleware.StatsdMiddleware.scope
-    middleware.start("key")
-    assert middleware.stop("key") is not None
-    with middleware.with_("ctx"):
+    middleware.start('key')
+    assert middleware.stop('key') is not None
+    with middleware.with_('ctx'):
         pass
-    middleware.incr("counted")
-    middleware.decr("counted")
-    middleware.incr("counted")
-    assert "ctx" in scope.timings.data
-    assert scope.counter.data["counted"] == 1
+    middleware.incr('counted')
+    middleware.decr('counted')
+    middleware.incr('counted')
+    assert 'ctx' in scope.timings.data
+    assert scope.counter.data['counted'] == 1
 
 
 def test_module_helpers_without_scope() -> None:
-    middleware.start("key")  # no-op
-    assert middleware.stop("key") is None
-    assert isinstance(middleware.with_("ctx"), middleware.DummyWith)
-    with middleware.with_("ctx"):
+    middleware.start('key')  # no-op
+    assert middleware.stop('key') is None
+    assert isinstance(middleware.with_('ctx'), middleware.DummyWith)
+    with middleware.with_('ctx'):
         pass
-    middleware.incr("x")  # no-op
-    middleware.decr("x")  # no-op
+    middleware.incr('x')  # no-op
+    middleware.decr('x')  # no-op
 
 
 def test_wrapper_and_decorator(sent: list) -> None:
     middleware.StatsdMiddleware.start()
     scope = middleware.StatsdMiddleware.scope
 
-    @middleware.decorator("deco")
+    @middleware.decorator('deco')
     def sample_function() -> str:
-        return "ok"
+        return 'ok'
 
-    assert sample_function() == "ok"
-    assert "deco.sample_function" in scope.timings.data
+    assert sample_function() == 'ok'
+    assert 'deco.sample_function' in scope.timings.data
 
     def named(value: Any) -> Any:
         return value
 
-    wrapped = middleware.named_wrapper("custom_name", named)
+    wrapped = middleware.named_wrapper('custom_name', named)
     assert wrapped(42) == 42
-    assert "custom_name" in scope.timings.data
+    assert 'custom_name' in scope.timings.data

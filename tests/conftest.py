@@ -5,10 +5,15 @@ from typing import Any
 
 import pytest
 import statsd
-
 from django_statsd import middleware
 
-SCOPE_ATTRS = ("timings", "counter", "counter_codes", "counter_site", "view_name")
+SCOPE_ATTRS = (
+    'timings',
+    'counter',
+    'counter_codes',
+    'counter_site',
+    'view_name',
+)
 
 
 @pytest.fixture(autouse=True)
@@ -34,7 +39,7 @@ def sent(monkeypatch: pytest.MonkeyPatch) -> list[dict[str, Any]]:
         captured.append(dict(data))
         return True
 
-    monkeypatch.setattr(statsd.Connection, "send", fake_send)
+    monkeypatch.setattr(statsd.Connection, 'send', fake_send)
     return captured
 
 

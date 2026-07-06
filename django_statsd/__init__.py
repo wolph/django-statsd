@@ -2,6 +2,7 @@
 
 from importlib import metadata
 
+from django_statsd import celery, json, redis, templates
 from django_statsd.middleware import (
     decorator,
     decr,
@@ -12,21 +13,20 @@ from django_statsd.middleware import (
     with_,
     wrapper,
 )
-from django_statsd import celery, json, redis, templates
 
-__version__: str = metadata.version("django-statsd")
+__version__: str = metadata.version('django-statsd')
 
 __all__ = [
-    "celery",
-    "decorator",
-    "decr",
-    "incr",
-    "json",
-    "named_wrapper",
-    "redis",
-    "start",
-    "stop",
-    "templates",
-    "with_",
-    "wrapper",
+    'celery',
+    'decorator',
+    'decr',
+    'incr',
+    'json',
+    'named_wrapper',
+    'redis',
+    'start',
+    'stop',
+    'templates',
+    'with_',
+    'wrapper',
 ]
