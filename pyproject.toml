@@ -1,0 +1,87 @@
+[build-system]
+requires = ["uv_build>=0.11.0,<0.12"]
+build-backend = "uv_build"
+
+[project]
+name = "django-statsd"
+version = "3.0.0"
+description = "Django app that submits query and view durations to statsd."
+readme = "README.rst"
+license = "BSD-3-Clause"
+license-files = ["LICENSE"]
+requires-python = ">=3.10"
+authors = [{ name = "Rick van Hattem", email = "Wolph@Wol.ph" }]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Environment :: Web Environment",
+    "Framework :: Django",
+    "Framework :: Django :: 4.2",
+    "Framework :: Django :: 5.2",
+    "Framework :: Django :: 6.0",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: BSD License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Topic :: Internet :: WWW/HTTP",
+    "Typing :: Typed",
+]
+dependencies = [
+    "django>=4.2",
+    "python-statsd>=2.1",
+]
+
+[project.urls]
+Homepage = "https://github.com/WoLpH/django-statsd/"
+Documentation = "https://django-stats.readthedocs.io/"
+Changelog = "https://github.com/WoLpH/django-statsd/blob/master/CHANGELOG.md"
+
+[project.optional-dependencies]
+docs = [
+    "sphinx>=8.0",
+    "furo>=2025.1",
+]
+tests = [
+    "pytest>=8.0",
+    "pytest-django>=4.8",
+    "pytest-cov>=6.0",
+    "coverage>=7.0",
+    "celery>=5.3",
+    "redis>=5.0",
+]
+dev = [
+    "django-statsd[tests]",
+    "ruff>=0.15.0",
+    "mypy>=1.14",
+    "django-stubs[compatible-mypy]>=5.1",
+    "basedpyright>=1.0",
+    "pyrefly>=0.1",
+]
+tox = [
+    "tox>=4.0",
+    "tox-uv>=1.0",
+    "tox-gh-actions>=3.0",
+]
+
+[tool.uv.build-backend]
+module-root = ""
+module-name = "django_statsd"
+
+[tool.pytest.ini_options]
+DJANGO_SETTINGS_MODULE = "tests.settings"
+testpaths = ["tests"]
+addopts = [
+    "--cov=django_statsd",
+    "--cov-report=term-missing",
+    "--no-cov-on-fail",
+]
+
+[tool.coverage.run]
+branch = true
+source = ["django_statsd"]

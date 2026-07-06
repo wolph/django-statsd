@@ -1,26 +1,32 @@
+"""django-statsd: submit Django query and view durations to statsd."""
+
+from importlib import metadata
+
 from django_statsd.middleware import (
+    decorator,
     decr,
     incr,
+    named_wrapper,
     start,
     stop,
     with_,
     wrapper,
-    named_wrapper,
-    decorator,
 )
-from django_statsd import redis, celery, json, templates
+from django_statsd import celery, json, redis, templates
+
+__version__: str = metadata.version("django-statsd")
 
 __all__ = [
-    'decr',
-    'incr',
-    'start',
-    'stop',
-    'with_',
-    'wrapper',
-    'named_wrapper',
-    'decorator',
-    'json',
-    'redis',
-    'celery',
-    'templates',
+    "celery",
+    "decorator",
+    "decr",
+    "incr",
+    "json",
+    "named_wrapper",
+    "redis",
+    "start",
+    "stop",
+    "templates",
+    "with_",
+    "wrapper",
 ]
