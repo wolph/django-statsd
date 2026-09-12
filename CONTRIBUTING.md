@@ -96,21 +96,63 @@ four.
 
 ### Documentation samples are tests
 
-Every ``python`` and ``bash`` block in README.md and under docs/ is
+Every `python` and `bash` block in README.md and under docs/ is
 executed by `tests/docs_examples`, inside a request the middleware is
 timing. A sample that calls an API that no longer exists fails the
-build, and the traceback points at the line in the document rather than
-at the harness.
+build, and the traceback points at the line in the document.
 
 That puts two constraints on what you write. A python sample has to run
-against the package alone, with no imaginary application to import from.
-A bash sample has to be one of the install commands the harness knows
-how to rewrite. Anything else belongs in a `console` block, which the
-harness skips on purpose.
+against the package alone, with no imaginary application to import
+from. A bash sample has to be one of the install commands the harness
+knows how to rewrite. Anything else belongs in a `console` block, which
+the harness skips on purpose.
+
+### Transcripts are recordings
+
+The documentation never says what a metric is called without showing
+it. The files under `docs/_transcripts/` are produced by really running
+requests, queries and tasks with the statsd connection captured, and
+`tests/docs_examples/test_transcripts.py` regenerates them and fails if
+they drift. Nothing in them is typed by hand.
+
+The demo application lives in `tests/docs_examples/_demo.py`. Its views
+declare `__module__ = 'myproject.views'`, and django-statsd names a
+view metric after the view's own module, so they really report under
+that name. A transcript, the dashboard screenshot and the prose all
+quote the same strings, and nothing is rewritten on the way out.
+
+Two transcripts hold real durations rather than only names:
+`payload.txt` and `chart_data.txt`. Durations change from run to run,
+so their tests check the metric names and leave the numbers alone.
+
+### Regenerating the images
 
 ```bash
-tox -e docs-examples
+tox -e docs-assets
 ```
+
+That rebuilds the transcripts, the logo, the timing chart, the terminal
+recording and the Grafana screenshot. It needs more than Python:
+
+- `asciinema` and `agg` for the terminal recording
+- `docker` for the dashboard, which brings up statsd, Graphite and
+  Grafana, drives five minutes of real traffic at them and screenshots
+  the result
+
+CI never runs this. Those tools are too heavy and too flaky for a pull
+request gate, so the images are committed artefacts and the deterministic
+half is what gets gated: transcripts, samples and the `-W` docs build.
+Regenerate the images when behaviour they show has changed.
+
+### Checking the prose
+
+```bash
+uv run python docs/generate/style_check.py
+```
+
+Counts the style guide's tells in this project and in a reference
+corpus side by side. It is advisory and never fails. A pattern the
+reference also uses is the author's and stays.
 
 ### Building the documentation
 

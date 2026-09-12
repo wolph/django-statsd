@@ -41,8 +41,13 @@
 - Every code sample in README.md and under `docs/` is executed as a
   test, inside a request the middleware is timing, so a sample that
   drifts from the API fails the build.
-- The documentation grew a getting-started section, a user guide and an
-  API reference in place of the single usage page.
+- The documentation is organised by what you want to measure instead of
+  by which module does it, and every claim about a metric name is
+  backed by a transcript recorded from a real run and checked by a
+  test.
+- The README carries a logo, six badges, a recording of metrics
+  arriving, a timing breakdown chart and a Grafana screenshot, each one
+  generated from real behaviour by a committed script.
 
 ## 2.7.0 and earlier
 
