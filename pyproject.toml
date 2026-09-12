@@ -104,6 +104,10 @@ warn_return_any = false
 [tool.django-stubs]
 django_settings_module = "tests.settings"
 
+# celery has local stubs in typings/, but they are wired to pyright
+# only. mypy reads the installed, untyped celery as Any and is clean that
+# way, whereas pointing mypy_path at the stubs turns the
+# `except ImportError: signals = None` fallback into three new errors.
 [[tool.mypy.overrides]]
 module = ["statsd.*", "celery.*"]
 ignore_missing_imports = true
@@ -112,15 +116,13 @@ ignore_missing_imports = true
 pythonPlatform = "All"
 include = ["django_statsd"]
 ignore = [".venv"]
+stubPath = "typings"
 typeCheckingMode = "strict"
-# python-statsd and celery ship no type information; silence the unknown-
-# type fallout instead of writing stubs for them.
+# python-statsd ships no type information. Its surface here is small and
+# every value crossing into django_statsd is annotated, so the import
+# complaint is silenced rather than stubbed. celery has local stubs in
+# typings/ instead.
 reportMissingTypeStubs = false
-reportUnknownArgumentType = false
-reportUnknownMemberType = false
-reportUnknownVariableType = false
-# request.statsd is a documented dynamic attribute set by the middleware.
-reportAttributeAccessIssue = false
 
 [tool.pyrefly]
 project-includes = ["django_statsd"]

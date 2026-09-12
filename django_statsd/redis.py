@@ -1,6 +1,7 @@
 """Patch :class:`redis.Redis` to time commands as ``redis.<command>``."""
 
-from typing import Any
+from collections.abc import Callable
+from typing import Any, cast
 
 from django_statsd import middleware
 
@@ -19,16 +20,25 @@ if (
     redis is not None  # type: ignore[redundant-expr]
     and not getattr(redis.Redis, 'statsd_patched', False)
 ):
+    # The pre-patch class, kept as a handle for tests and for anything
+    # that needs to reach past the patch. The class below subclasses
+    # `redis.Redis` by name so its base stays statically resolvable.
     _original_redis = redis.Redis
 
-    class StatsdRedis(_original_redis):
+    class StatsdRedis(redis.Redis):
         statsd_patched = True
 
         def execute_command(self, *args: Any, **kwargs: Any) -> Any:
             name = str(args[0]).lower() if args else 'unknown'
             with middleware.with_(f'redis.{name}'):
-                # redis.Redis.execute_command ships with no annotations.
-                call = super().execute_command
-                return call(*args, **kwargs)  # type: ignore[no-untyped-call]
+                # redis ships py.typed but leaves execute_command
+                # unannotated. Casting keeps the unknown from leaking
+                # into this method's return value.
+                # mypy already reads it as Callable, hence the
+                # redundant-cast suppression.
+                call = cast(  # type: ignore[redundant-cast]
+                    'Callable[..., Any]', super().execute_command
+                )
+                return call(*args, **kwargs)
 
     redis.Redis = StatsdRedis  # type: ignore[misc]  # ty: ignore[invalid-assignment]
