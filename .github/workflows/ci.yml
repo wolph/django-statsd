@@ -53,7 +53,7 @@ jobs:
   coverage:
     runs-on: ubuntu-latest
     timeout-minutes: 5
-    needs: [test]
+    needs: [test, docs]
     steps:
       - uses: actions/checkout@v6
       - uses: astral-sh/setup-uv@v7
@@ -107,3 +107,11 @@ jobs:
         run: uv pip install '.[tox]'
       - name: Build docs
         run: tox -e docs
+      - name: Run the documentation samples
+        run: tox -e docs-examples
+      - name: Upload coverage
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-docs-examples
+          path: .tox/.coverage.*
+          include-hidden-files: true
