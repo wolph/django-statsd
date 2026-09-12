@@ -1,0 +1,8 @@
+# One task, run and then failed
+
+celery.status.task_failure
+celery.status.task_postrun
+celery.status.task_prerun
+myproject.celery.myproject.tasks.send_invoice.hit
+myproject.celery.myproject.tasks.send_invoice.total
+myproject.celery.site.hit

@@ -1,0 +1,11 @@
+# GET /broken/, which raises
+
+myproject.view.get.myproject.views.broken.hit
+myproject.view.get.myproject.views.broken.process_exception
+myproject.view.get.myproject.views.broken.process_request
+myproject.view.get.myproject.views.broken.process_response
+myproject.view.get.myproject.views.broken.process_view
+myproject.view.get.myproject.views.broken.total
+myproject.view.http_codes.5xx
+myproject.view.http_codes.hit
+myproject.view.site.hit

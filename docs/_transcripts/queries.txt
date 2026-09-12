@@ -1,0 +1,11 @@
+# GET /orders/ with STATSD_TRACK_DATABASE on
+
+myproject.view.get.myproject.views.orders.hit
+myproject.view.get.myproject.views.orders.process_request
+myproject.view.get.myproject.views.orders.process_response
+myproject.view.get.myproject.views.orders.process_view
+myproject.view.get.myproject.views.orders.sql.default
+myproject.view.get.myproject.views.orders.total
+myproject.view.http_codes.2xx
+myproject.view.http_codes.hit
+myproject.view.site.hit

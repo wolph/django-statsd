@@ -1,0 +1,19 @@
+# GET /search/ and GET /checkout/
+
+myproject.view.get.myproject.views.checkout.hit
+myproject.view.get.myproject.views.checkout.payment.attempt
+myproject.view.get.myproject.views.checkout.payment.authorise
+myproject.view.get.myproject.views.checkout.process_request
+myproject.view.get.myproject.views.checkout.process_response
+myproject.view.get.myproject.views.checkout.process_view
+myproject.view.get.myproject.views.checkout.total
+myproject.view.get.myproject.views.search.build_queryset
+myproject.view.get.myproject.views.search.hit
+myproject.view.get.myproject.views.search.json.dumps
+myproject.view.get.myproject.views.search.process_request
+myproject.view.get.myproject.views.search.process_response
+myproject.view.get.myproject.views.search.process_view
+myproject.view.get.myproject.views.search.total
+myproject.view.http_codes.2xx
+myproject.view.http_codes.hit
+myproject.view.site.hit
