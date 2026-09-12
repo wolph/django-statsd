@@ -20,7 +20,9 @@ the way ``view.site.hit`` counts every request.
 to every signal Celery exports, one counter per signal, so
 ``task_failure`` above is a task that failed. If you run more than one
 project against one statsd, these names collide, and there's no setting
-to change it.
+to change it. I give each project its own statsd for exactly this
+reason, and I found out by wondering why ``task_failure`` was running
+at twice the rate my logs said.
 
 Timers survive a failure
 ------------------------

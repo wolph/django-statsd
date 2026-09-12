@@ -27,7 +27,9 @@ Through the module
 ------------------
 
 When the code doing the work has no request to hand, the module-level
-helpers reach the same scope from anywhere.
+helpers reach the same scope from anywhere. I use the context manager
+almost everywhere. ``start`` and ``stop`` only earn their place when
+the two ends sit in different methods.
 
 .. code-block:: python
 

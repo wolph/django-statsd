@@ -17,11 +17,13 @@ import pytest
 
 from ._metrics import (
     CHART_PATH,
+    OVERHEAD_PATH,
     PAYLOAD_PATH,
     SCENARIOS,
     Scenario,
     payload_names,
     record_chart_data,
+    record_database_overhead,
     record_payload,
 )
 
@@ -109,3 +111,16 @@ def test_documented_middleware_order_error_is_real() -> None:
         encoding='utf-8'
     )
     assert message in page, 'views.rst no longer quotes the real error'
+
+
+@pytest.mark.django_db
+def test_database_overhead_is_recorded() -> None:
+    """Timings vary per machine, so only the shape is asserted."""
+    if REGENERATE:
+        OVERHEAD_PATH.write_text(record_database_overhead(), encoding='utf-8')
+
+    assert OVERHEAD_PATH.exists()
+    body = OVERHEAD_PATH.read_text(encoding='utf-8')
+    assert 'STATSD_TRACK_DATABASE off' in body
+    assert 'STATSD_TRACK_DATABASE on' in body
+    assert 'overhead' in body

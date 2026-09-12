@@ -1,0 +1,5 @@
+# Mean ms per GET /orders/, 300 requests each
+
+STATSD_TRACK_DATABASE off  0.193
+STATSD_TRACK_DATABASE on   0.203
+overhead                   +0.010 ms (+5.0%)

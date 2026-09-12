@@ -246,3 +246,43 @@ def record_chart_data() -> str:
         for name, value in sorted(timings.items(), key=lambda item: -item[1])
     )
     return '\n'.join(lines) + '\n'
+
+
+OVERHEAD_PATH: Final[Path] = TRANSCRIPT_ROOT / 'database_overhead.txt'
+
+
+def record_database_overhead(rounds: int = 300) -> str:
+    """Time the same view with and without query timing.
+
+    STATSD_TRACK_DATABASE wraps every connection for the duration of a
+    request, which sounds expensive until it is measured. One machine,
+    one run, so the ratio is the part worth reading.
+    """
+    import time
+
+    def run(rounds: int, *, tracking: bool) -> float:
+        with demo_settings(STATSD_TRACK_DATABASE=tracking), capture():
+            _get('/orders/')  # warm up
+            start = time.perf_counter()
+            for _ in range(rounds):
+                _get('/orders/')
+            return (time.perf_counter() - start) / rounds * 1000
+
+    off = run(rounds, tracking=False)
+    on = run(rounds, tracking=True)
+
+    return (
+        '\n'.join(
+            [
+                f'# Mean ms per GET /orders/, {rounds} requests each',
+                '',
+                f'STATSD_TRACK_DATABASE off  {off:.3f}',
+                f'STATSD_TRACK_DATABASE on   {on:.3f}',
+                (
+                    f'overhead                   {on - off:+.3f} ms '
+                    f'({(on / off - 1) * 100:+.1f}%)'
+                ),
+            ]
+        )
+        + '\n'
+    )

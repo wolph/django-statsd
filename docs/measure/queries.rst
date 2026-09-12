@@ -27,6 +27,17 @@ before any of this and lands in the enclosing view timing instead, so a
 view that is slow with a fast ``sql.default`` is telling you the
 problem isn't the database.
 
+What it costs
+-------------
+
+.. literalinclude:: ../_transcripts/database_overhead.txt
+   :language: text
+
+Ten microseconds a request. The percentage looks larger than it is
+because the demo view does almost nothing: measured against a view that
+takes 50 ms, those same ten microseconds are two hundredths of a
+percent. Leave it on if you want the numbers.
+
 A note on 3.0
 -------------
 

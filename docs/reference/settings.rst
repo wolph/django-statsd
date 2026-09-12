@@ -28,12 +28,13 @@ as a second project reports to the same statsd, and it costs nothing to
 set on the first.
 
 ``STATSD_SAMPLE_RATE`` is the odds that any given metric is really
-submitted, between 0 and 1. Drop it when the volume costs more than the
-resolution is worth.
+submitted, between 0 and 1. Lowering it is worth considering only on a
+really high volume site. The performance impact is usually negligible
+either way.
 
 ``STATSD_TRACK_MIDDLEWARE`` is the master switch for the view metrics
 and defaults to ``False``. ``STATSD_TRACK_DATABASE`` does the same for
-query timings, and :doc:`../measure/queries` covers what it costs.
+query timings, and :doc:`../measure/queries` measures what it costs.
 
 ``STATSD_DISABLED`` keeps the package loaded and silent, which is
 easier in a test suite than pulling the middlewares out of the stack.
