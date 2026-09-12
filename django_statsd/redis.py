@@ -7,7 +7,7 @@ from django_statsd import middleware
 try:
     import redis
 except ImportError:  # pragma: no cover
-    redis = None  # type: ignore[assignment]  # ty: ignore[invalid-assignment]
+    redis = None  # type: ignore[assignment]
 
 
 if (

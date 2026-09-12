@@ -13,8 +13,9 @@ except ImportError:  # pragma: no cover
     # celery ships no type information (see [[tool.mypy.overrides]]),
     # so `signals`/`dispatch` are already typed `Any` for mypy and
     # reassigning `None` here needs no ignore there. ty resolves the
-    # real celery submodules instead, so it needs its own suppression.
-    signals = None  # ty: ignore[invalid-assignment]
+    # real `celery.utils.dispatch` module instead, so that one needs
+    # its own suppression.
+    signals = None
     dispatch = None  # ty: ignore[invalid-assignment]
 
 

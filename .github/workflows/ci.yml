@@ -20,18 +20,19 @@ jobs:
       fail-fast: false
       matrix:
         python-version: ['3.10', '3.11', '3.12', '3.13', '3.14']
-        django-version: ['django42', 'django52', 'django60']
+        django-version: ['django52', 'django60', 'django61']
+        # Django 5.2 supports Python 3.10-3.13; 6.0 and 6.1 need 3.12+.
         exclude:
-          - python-version: '3.13'
-            django-version: 'django42'
-          - python-version: '3.14'
-            django-version: 'django42'
           - python-version: '3.14'
             django-version: 'django52'
           - python-version: '3.10'
             django-version: 'django60'
           - python-version: '3.11'
             django-version: 'django60'
+          - python-version: '3.10'
+            django-version: 'django61'
+          - python-version: '3.11'
+            django-version: 'django61'
     steps:
       - uses: actions/checkout@v6
       - uses: astral-sh/setup-uv@v7
@@ -92,7 +93,7 @@ jobs:
       - name: Install tox
         run: uv pip install '.[tox]'
       - name: Type-check
-        run: tox -e pyrefly,mypy,basedpyright
+        run: tox -e pyrefly,mypy,basedpyright,ty
 
   docs:
     runs-on: ubuntu-latest
