@@ -14,8 +14,14 @@ ignore = [
     'A003', # Class attribute {name} is shadowing a Python builtin
     'B023', # function-uses-loop-variable
     'COM812', # Missing trailing comma in a list
+    'ANN401', # Dynamically typed expressions (typing.Any) are disallowed.
+    # statsd, celery and redis ship no usable types, and a Django signal
+    # receiver really does take arbitrary kwargs. Naming a type we do not
+    # know would be a guess dressed up as an annotation.
+    'D203', # one-blank-line-before-class, conflicts with D211
     'D205', # blank-line-after-summary
     'D212', # multi-line-summary-first-line
+    'D213', # multi-line-summary-second-line, conflicts with D212
     'ISC001', # String concatenation with implicit str conversion
     'Q001', # Remove bad quotes
     'Q002', # Remove bad quotes
@@ -29,11 +35,13 @@ ignore = [
 
 select = [
     'A', # flake8-builtins
+    'ANN', # flake8-annotations: every signature is annotated
     'ASYNC', # flake8 async checker
     'B', # flake8-bugbear
     'C4', # flake8-comprehensions
     'C90', # mccabe
     'COM', # flake8-commas
+    'D', # pydocstyle: every public thing carries a docstring
     'DJ', # flake8-django
     'E', # pycodestyle error ('W' for warning)
     'F', # pyflakes
@@ -60,7 +68,13 @@ select = [
 'docs/*' = ['INP001', 'RUF012']
 # Generator scripts: they are command line tools, so they print,
 # and matplotlib is configured before pyplot is imported.
-'docs/generate/*' = ['INP001', 'RUF012', 'T201', 'ICN001', 'E402', 'PERF203']
+# Tests and generators document themselves in comments, and their
+# helpers are not public API.
+'tests/**' = ['D100', 'D101', 'D102', 'D103', 'D104', 'D105', 'D107']
+'docs/generate/*' = [
+    'INP001', 'RUF012', 'T201', 'ICN001', 'E402', 'PERF203',
+    'D100', 'D101', 'D102', 'D103', 'D104', 'D105', 'D107',
+]
 
 [lint.isort]
 case-sensitive = true

@@ -59,7 +59,8 @@ def test_celery_signals_unavailable_skips_connection(
     cleanly with `signals`/`dispatch` set to `None` and skip connecting
     any receivers. Loaded as a standalone module copy (rather than
     reloading `django_statsd.celery` in place) so the real signal
-    connections used by the rest of the suite are left untouched."""
+    connections used by the rest of the suite are left untouched.
+    """
     fake_celery = types.ModuleType('celery')
     monkeypatch.setitem(sys.modules, 'celery', fake_celery)
     # `celery.signals` is already cached from the real import at collection

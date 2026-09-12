@@ -51,7 +51,7 @@ def orders(request: HttpRequest) -> HttpResponse:
 
 
 def heavy_report(request: HttpRequest) -> HttpResponse:
-    """A view that does enough real work to be worth charting.
+    """Do enough real work to be worth charting.
 
     The durations in the documentation's chart come from this view. The
     work is real, not a sleep: a few hundred template renders, a real

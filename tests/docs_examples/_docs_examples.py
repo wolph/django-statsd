@@ -247,7 +247,7 @@ def validate_statsd_settings(defined: dict[str, Any]) -> tuple[str, ...]:
 
 
 def install_target(command: str) -> str | None:
-    """The install spec a documented install command should really use."""
+    """Return the install spec a documented command should really use."""
     return INSTALL_REWRITES.get(command.strip())
 
 

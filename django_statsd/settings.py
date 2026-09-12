@@ -7,6 +7,12 @@ from django.core import exceptions
 
 
 def get_setting(key: str, default: Any = None) -> Any:
+    """Read `key` from Django's settings.
+
+    Returns `default` when Django is not configured yet, so importing
+    this module never raises.
+
+    """
     try:
         return getattr(settings, key, default)
     except exceptions.ImproperlyConfigured:

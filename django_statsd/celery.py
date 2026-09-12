@@ -36,14 +36,17 @@ if signals is not None and dispatch is not None:
             _instance.connect(_make_increment(_signal_name), weak=False)
 
     def start(**kwargs: Any) -> None:
+        """Open a scope when a task starts."""
         middleware.StatsdMiddleware.start('celery')
 
     def stop(task: Any = None, **kwargs: Any) -> None:
+        """Submit the task's metrics and close the scope."""
         if task is not None:
             middleware.StatsdMiddleware.stop(task.name)
         middleware.StatsdMiddleware.scope.timings = None
 
     def clear(**kwargs: Any) -> None:
+        """Drop the scope, so a failed task leaves no timer running."""
         middleware.StatsdMiddleware.scope.timings = None
 
     signals.task_prerun.connect(start)

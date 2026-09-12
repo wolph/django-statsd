@@ -13,6 +13,7 @@ def get_connection(
     sample_rate: float | None = None,
     disabled: bool | None = None,
 ) -> Any:
+    """Build a python-statsd connection, defaulting to the settings."""
     if not host:
         host = settings.STATSD_HOST
 
@@ -33,6 +34,7 @@ def get_client(
     connection: Any = None,
     class_: type[Any] = statsd.Client,
 ) -> Any:
+    """Build a python-statsd client of `class_` named `name`."""
     if not connection:
         connection = get_connection()
 
@@ -40,8 +42,10 @@ def get_client(
 
 
 def get_timer(name: str, connection: Any = None) -> Any:
+    """Build a :class:`statsd.Timer` named `name`."""
     return get_client(name, connection, statsd.Timer)
 
 
 def get_counter(name: str, connection: Any = None) -> Any:
+    """Build a :class:`statsd.Counter` named `name`."""
     return get_client(name, connection, statsd.Counter)

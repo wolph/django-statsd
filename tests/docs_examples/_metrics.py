@@ -212,7 +212,7 @@ CHART_PATH: Final[Path] = TRANSCRIPT_ROOT / 'chart_data.txt'
 
 
 def _common_prefix(names: tuple[str, ...]) -> str:
-    """The shared `view.get.myproject.views.x.` part of a metric name."""
+    """Return the part every one of these metric names shares."""
     if not names:
         return ''
 
@@ -228,7 +228,7 @@ def _common_prefix(names: tuple[str, ...]) -> str:
 
 
 def record_chart_data() -> str:
-    """Timings from a view doing real work, for the breakdown chart."""
+    """Record timings from a view doing real work, for the chart."""
     with demo_settings(STATSD_TRACK_DATABASE=True), capture() as payloads:
         _get('/heavy/')
 

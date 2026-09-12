@@ -26,9 +26,12 @@ if (
     _original_redis = redis.Redis
 
     class StatsdRedis(redis.Redis):
+        """A :class:`redis.Redis` that times every command it runs."""
+
         statsd_patched = True
 
         def execute_command(self, *args: Any, **kwargs: Any) -> Any:
+            """Run a command, timed as ``redis.<command>``."""
             name = str(args[0]).lower() if args else 'unknown'
             with middleware.with_(f'redis.{name}'):
                 # redis ships py.typed but leaves execute_command

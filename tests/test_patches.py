@@ -1,6 +1,7 @@
 import importlib
 import json
 
+import pytest
 from django.template import loader
 from django_statsd import (
     json as statsd_json,
@@ -41,7 +42,7 @@ def test_template_reimport_does_not_double_patch() -> None:
     assert loader.render_to_string is inner
 
 
-def test_redis_patched(monkeypatch) -> None:
+def test_redis_patched(monkeypatch: pytest.MonkeyPatch) -> None:
     assert getattr(redis_lib.Redis, 'statsd_patched', False)
     monkeypatch.setattr(
         statsd_redis._original_redis,

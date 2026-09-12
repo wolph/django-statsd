@@ -31,7 +31,8 @@ def image_urls(text: str) -> list[str]:
 
 def test_every_readme_image_url_is_absolute() -> None:
     """Relative URLs break on PyPI, which renders the README detached
-    from the repository it came from."""
+    from the repository it came from.
+    """
     relative = [
         url
         for url in image_urls(README_PATH.read_text(encoding='utf-8'))
@@ -46,7 +47,8 @@ def test_readme_carries_at_least_one_image() -> None:
 
 def test_readme_transcripts_match_their_recordings() -> None:
     """The README cannot use literalinclude, so its transcripts are
-    pasted. This checks the paste against the recording."""
+    pasted. This checks the paste against the recording.
+    """
     text = README_PATH.read_text(encoding='utf-8')
     blocks = list(TRANSCRIPT_BLOCK.finditer(text))
     assert blocks, 'no marked transcript blocks found in README.md'
