@@ -25,10 +25,10 @@ EXPECTED_LANGUAGES = {
     'README.md': ('bash', 'python', 'python', 'python'),
     'docs/getting-started/installation.rst': ('bash',),
     'docs/getting-started/quickstart.rst': ('python',),
-    'docs/guide/database.rst': ('python',),
-    'docs/guide/manual-timing.rst': ('python', 'python'),
-    'docs/guide/middleware.rst': ('python', 'python'),
-    'docs/guide/settings.rst': ('python',),
+    'docs/measure/queries.rst': ('python',),
+    'docs/measure/views.rst': ('python',),
+    'docs/measure/your-own-code.rst': ('python', 'python'),
+    'docs/reference/settings.rst': ('python',),
 }
 
 

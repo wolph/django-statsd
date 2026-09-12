@@ -1,26 +1,26 @@
 Installation
 ============
 
-django-statsd needs Python 3.10 or newer and Django 5.2 or newer. It is
-tested against Django 5.2, 6.0 and 6.1.
-
 .. code-block:: bash
 
     pip install django-statsd
 
-That pulls in ``python-statsd`` and ``asgiref`` alongside Django.
+That brings in Django, ``python-statsd`` and ``asgiref``.
 
-Optional integrations
----------------------
+You need Python 3.10 or newer and Django 5.2 or newer. The test matrix
+runs Django 5.2, 6.0 and 6.1 across Python 3.10 through 3.14.
 
-celery and redis are not dependencies. django-statsd patches them only
-when they import, so installing either one later is enough to start
-collecting their metrics. Nothing needs to change in your settings.
+Celery and redis
+----------------
+
+Neither is a dependency. django-statsd patches them when they import
+and does nothing when they don't, so installing either one later starts
+its metrics without a settings change.
 
 Where the metrics go
 --------------------
 
-Metrics are sent over UDP to ``127.0.0.1:8125`` unless you say
-otherwise, which means a missing statsd server costs you the metrics
-rather than the request. See :doc:`../guide/settings` for the host and
-port settings.
+statsd speaks UDP, and django-statsd doesn't wait for a reply. A statsd
+server that is down or absent costs you the metrics and leaves the
+request alone. The default target is ``127.0.0.1:8125``, which
+:doc:`../reference/settings` shows you how to change.
