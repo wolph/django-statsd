@@ -56,7 +56,7 @@ STATSD_TRACK_DATABASE = True
 ```
 
 The full list of settings is documented on
-[Read the Docs](https://django-stats.readthedocs.io/en/latest/django_statsd.html#module-django_statsd.settings).
+[Read the Docs](https://django-stats.readthedocs.io/en/latest/api/index.html#module-django_statsd.settings).
 
 ## Advanced usage
 

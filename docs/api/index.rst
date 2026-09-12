@@ -1,5 +1,5 @@
-django_statsd Package
-=====================
+API Reference
+=============
 
 :mod:`django_statsd` Package
 ----------------------------
@@ -17,10 +17,10 @@ django_statsd Package
     :undoc-members:
     :show-inheritance:
 
-:mod:`celery` Module
---------------------
+:mod:`middleware` Module
+------------------------
 
-.. automodule:: django_statsd.celery
+.. automodule:: django_statsd.middleware
     :members:
     :undoc-members:
     :show-inheritance:
@@ -33,18 +33,18 @@ django_statsd Package
     :undoc-members:
     :show-inheritance:
 
-:mod:`json` Module
-------------------
+:mod:`celery` Module
+--------------------
 
-.. automodule:: django_statsd.json
+.. automodule:: django_statsd.celery
     :members:
     :undoc-members:
     :show-inheritance:
 
-:mod:`middleware` Module
-------------------------
+:mod:`json` Module
+------------------
 
-.. automodule:: django_statsd.middleware
+.. automodule:: django_statsd.json
     :members:
     :undoc-members:
     :show-inheritance:
@@ -72,4 +72,3 @@ django_statsd Package
     :members:
     :undoc-members:
     :show-inheritance:
-

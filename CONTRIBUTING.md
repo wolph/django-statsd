@@ -64,8 +64,9 @@ tox owns the support matrix, so a local `tox` run is the same one CI
 drives. tox-uv provisions any Python you do not have installed.
 
 ```bash
-tox                  # everything: matrix, lint, type checkers, docs, coverage
-tox -e lint          # ruff check and format check
+tox                    # everything: matrix, lint, types, docs, coverage
+tox -e lint            # ruff check and format check
+tox -e docs-examples   # execute the README and docs samples
 tox -e py313-django61  # a single cell
 ```
 
@@ -93,6 +94,24 @@ Four type checkers run in CI, all in strict mode: mypy with
 django-stubs, basedpyright, pyrefly and ty. A change has to satisfy all
 four.
 
+### Documentation samples are tests
+
+Every ``python`` and ``bash`` block in README.md and under docs/ is
+executed by `tests/docs_examples`, inside a request the middleware is
+timing. A sample that calls an API that no longer exists fails the
+build, and the traceback points at the line in the document rather than
+at the harness.
+
+That puts two constraints on what you write. A python sample has to run
+against the package alone, with no imaginary application to import from.
+A bash sample has to be one of the install commands the harness knows
+how to rewrite. Anything else belongs in a `console` block, which the
+harness skips on purpose.
+
+```bash
+tox -e docs-examples
+```
+
 ### Building the documentation
 
 ```bash
@@ -106,7 +125,8 @@ warnings into errors, which is what CI does too.
 ## Pull request guidelines
 
 1. New functionality needs tests. Coverage is enforced at 100%.
-2. Every CI check has to pass: tests, lint, all four type checkers, docs.
+2. Every CI check has to pass: tests, lint, all four type checkers,
+   docs and the documentation samples.
 3. The change should work on Python 3.10 through 3.14 and Django 5.2,
    6.0 and 6.1.
 

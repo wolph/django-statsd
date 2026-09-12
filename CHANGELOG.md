@@ -35,6 +35,14 @@
   lint/format, strict typing checked by mypy, basedpyright, pyrefly and
   ty, 100% test coverage enforced in CI, split GitHub Actions workflows
   with PyPI Trusted Publishing, furo-themed documentation.
+- basedpyright runs without blanket rule suppressions. celery has local
+  stubs under `typings/` instead, and the one genuinely unknown call
+  into redis is cast at the call site.
+- Every code sample in README.md and under `docs/` is executed as a
+  test, inside a request the middleware is timing, so a sample that
+  drifts from the API fails the build.
+- The documentation grew a getting-started section, a user guide and an
+  API reference in place of the single usage page.
 
 ## 2.7.0 and earlier
 
