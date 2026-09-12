@@ -1,0 +1,22 @@
+flowchart TB
+    R([Request]) --> SM
+
+    subgraph stack [MIDDLEWARE]
+        direction TB
+        SM["StatsdMiddleware<br/><i>opens the scope</i>"]
+        YOURS["your middlewares"]
+        SMT["StatsdMiddlewareTimer<br/><i>times the view</i>"]
+        SM --> YOURS --> SMT
+    end
+
+    SMT --> V["view<br/><i>request.statsd</i>"]
+    V --> DB[("execute_wrapper<br/>sql.&lt;alias&gt;")]
+    V --> T["render_to_string<br/>render_django"]
+
+    SM -. "scope on asgiref Local" .-> SCOPE(["timings, counters,<br/>view name"])
+    SCOPE -. "flushed on response" .-> OUT[/"statsd, UDP 8125"/]
+
+    classDef ours fill:#3b6ea5,stroke:#2a4f78,color:#fff
+    classDef theirs fill:#eef2f6,stroke:#b6c2ce,color:#1b1f23
+    class SM,SMT,SCOPE ours
+    class YOURS,V,DB,T,OUT theirs

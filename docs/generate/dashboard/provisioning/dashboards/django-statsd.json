@@ -1,0 +1,209 @@
+{
+  "uid": "django-statsd",
+  "title": "django-statsd",
+  "tags": [
+    "django"
+  ],
+  "timezone": "utc",
+  "editable": false,
+  "schemaVersion": 39,
+  "refresh": "",
+  "time": {
+    "from": "now-12m",
+    "to": "now"
+  },
+  "panels": [
+    {
+      "id": 1,
+      "title": "View response time (95th percentile)",
+      "type": "timeseries",
+      "datasource": {
+        "type": "graphite",
+        "uid": "graphite"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 0,
+        "w": 16,
+        "h": 9
+      },
+      "targets": [
+        {
+          "target": "alias(stats.timers.myproject.view.get.myproject.views.dashboard.total.upper_90, 'dashboard')",
+          "refId": "A"
+        },
+        {
+          "target": "alias(stats.timers.myproject.view.get.myproject.views.search.total.upper_90, 'search')",
+          "refId": "B"
+        },
+        {
+          "target": "alias(stats.timers.myproject.view.get.myproject.views.orders.total.upper_90, 'orders')",
+          "refId": "C"
+        },
+        {
+          "target": "alias(stats.timers.myproject.view.get.myproject.views.render_report.total.upper_90, 'report')",
+          "refId": "D"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "ms",
+          "custom": {
+            "lineWidth": 2,
+            "fillOpacity": 18,
+            "showPoints": "never",
+            "gradientMode": "opacity",
+            "lineInterpolation": "smooth"
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi"
+        }
+      }
+    },
+    {
+      "id": 2,
+      "title": "Requests per second",
+      "type": "timeseries",
+      "datasource": {
+        "type": "graphite",
+        "uid": "graphite"
+      },
+      "gridPos": {
+        "x": 16,
+        "y": 0,
+        "w": 8,
+        "h": 9
+      },
+      "targets": [
+        {
+          "target": "alias(sumSeries(stats.timers.myproject.view.get.myproject.views.*.total.count_ps), 'all views')",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "reqps",
+          "custom": {
+            "lineWidth": 2,
+            "fillOpacity": 18,
+            "showPoints": "never",
+            "gradientMode": "opacity",
+            "lineInterpolation": "smooth"
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi"
+        }
+      }
+    },
+    {
+      "id": 3,
+      "title": "Where the time goes (mean ms)",
+      "type": "timeseries",
+      "datasource": {
+        "type": "graphite",
+        "uid": "graphite"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 9,
+        "w": 12,
+        "h": 8
+      },
+      "targets": [
+        {
+          "target": "alias(stats.timers.myproject.view.get.myproject.views.orders.sql.default.mean, 'sql')",
+          "refId": "A"
+        },
+        {
+          "target": "alias(stats.timers.myproject.view.get.myproject.views.search.json.dumps.mean, 'json')",
+          "refId": "B"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "ms",
+          "custom": {
+            "lineWidth": 2,
+            "fillOpacity": 18,
+            "showPoints": "never",
+            "gradientMode": "opacity",
+            "lineInterpolation": "smooth"
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi"
+        }
+      }
+    },
+    {
+      "id": 4,
+      "title": "Exceptions per second",
+      "type": "timeseries",
+      "datasource": {
+        "type": "graphite",
+        "uid": "graphite"
+      },
+      "gridPos": {
+        "x": 12,
+        "y": 9,
+        "w": 12,
+        "h": 8
+      },
+      "targets": [
+        {
+          "target": "alias(stats.timers.myproject.view.get.myproject.views.broken.process_exception.count_ps, 'raised')",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "reqps",
+          "custom": {
+            "lineWidth": 2,
+            "fillOpacity": 18,
+            "showPoints": "never",
+            "gradientMode": "opacity",
+            "lineInterpolation": "smooth"
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi"
+        }
+      }
+    }
+  ]
+}

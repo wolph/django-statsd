@@ -46,6 +46,7 @@ Changelog = "https://github.com/WoLpH/django-statsd/blob/master/CHANGELOG.md"
 docs = [
     "sphinx>=8.0",
     "furo>=2025.1",
+    "sphinxcontrib-mermaid>=1.0",
 ]
 tests = [
     "pytest>=8.0",
@@ -63,6 +64,13 @@ dev = [
     "basedpyright>=1.0",
     "pyrefly>=0.1",
     "ty>=0.0.1",
+]
+# Generating the documentation images. Kept out of `tests` so the test
+# matrix stays lean, and out of CI, which never regenerates assets.
+assets = [
+    "matplotlib>=3.8",
+    "pillow>=10.0",
+    "playwright>=1.40",
 ]
 tox = [
     "tox>=4.0",
