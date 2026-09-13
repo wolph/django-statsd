@@ -67,7 +67,8 @@ myproject.view.site.hit
 
 `total` is the request, the three `process_*` names are the phases
 inside it, and `hit` is a counter so you get a rate per view without
-dividing anything. The last two are project-wide.
+dividing anything. The last three are project-wide: every request, every
+response classified, and this response's status class.
 
 ## Features
 
