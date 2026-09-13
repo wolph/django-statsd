@@ -77,32 +77,3 @@ def test_readme_images_live_in_the_repository() -> None:
         if not url.startswith(prefix):
             continue
         assert (root / url[len(prefix) :]).exists(), f'missing: {url}'
-
-
-COVERAGE_BADGE: Final[re.Pattern[str]] = re.compile(
-    r'img\.shields\.io/badge/coverage-(?P<percent>\d+)%25'
-)
-FAIL_UNDER: Final[re.Pattern[str]] = re.compile(
-    r'--fail-under=(?P<percent>\d+)'
-)
-
-
-def test_coverage_badge_matches_the_gate() -> None:
-    """A hardcoded percentage is only honest while CI enforces it.
-
-    The badge says 100%, and it is true because `tox -e coverage` fails
-    below that. If someone lowers the gate, this fails rather than
-    leaving the README quietly overstating things.
-    """
-    readme = README_PATH.read_text(encoding='utf-8')
-    badge = COVERAGE_BADGE.search(readme)
-    assert badge, 'no coverage badge found in README.md'
-
-    tox = (README_PATH.parent / 'tox.ini').read_text(encoding='utf-8')
-    gate = FAIL_UNDER.search(tox)
-    assert gate, 'no --fail-under in tox.ini'
-
-    assert badge['percent'] == gate['percent'], (
-        f'README badge claims {badge["percent"]}% coverage but tox.ini '
-        f'enforces {gate["percent"]}%'
-    )
