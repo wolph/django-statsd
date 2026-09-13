@@ -176,6 +176,15 @@ change to the API that breaks an example fails the build.
 - [Issues](https://github.com/WoLpH/django-statsd/issues)
 - [PyPI](https://pypi.org/project/django-statsd/)
 
+## Support
+
+django-statsd is maintained by [Rick van Hattem](https://github.com/wolph) in his own time.
+
+If it saved you an afternoon, a tip covers an hour of issue triage:
+[Ko-fi](https://ko-fi.com/wolph_gh) or [GitHub Sponsors](https://github.com/sponsors/wolph).
+
+[![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/wolph_gh)
+
 ## License
 
 [BSD 3-Clause](https://github.com/WoLpH/django-statsd/blob/master/LICENSE)

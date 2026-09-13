@@ -40,6 +40,12 @@ the code, and a test fails if one of them stops being true.
    reference/settings
    api/index
 
+.. toctree::
+   :maxdepth: 1
+   :caption: Project
+
+   sponsor
+
 Indices and Tables
 ==================
 

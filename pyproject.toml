@@ -41,6 +41,7 @@ dependencies = [
 Homepage = "https://github.com/WoLpH/django-statsd/"
 Documentation = "https://django-stats.readthedocs.io/"
 Changelog = "https://github.com/WoLpH/django-statsd/blob/master/CHANGELOG.md"
+Funding = "https://github.com/sponsors/wolph"
 
 [project.optional-dependencies]
 docs = [
