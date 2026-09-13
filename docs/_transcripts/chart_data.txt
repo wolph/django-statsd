@@ -1,9 +1,9 @@
 # Milliseconds, one run of GET /heavy/
 
-total 3.099
-render_django 2.273
-json.dumps 0.239
-process_response 0.042
-sql.default 0.014
-process_request 0.013
+total 3.245
+render_django 2.192
+json.dumps 0.266
+process_response 0.099
+process_request 0.021
+sql.default 0.015
 process_view 0.002

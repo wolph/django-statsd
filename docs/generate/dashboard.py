@@ -27,7 +27,7 @@ ROOT: Final[Path] = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'tests.settings')
 
-COMPOSE_DIR: Final[Path] = Path(__file__).resolve().parent / 'dashboard'
+COMPOSE_DIR: Final[Path] = ROOT / 'examples'
 OUTPUT: Final[Path] = ROOT / 'docs' / 'images' / 'dashboard.png'
 
 GRAPHITE: Final[str] = 'http://127.0.0.1:18280/'

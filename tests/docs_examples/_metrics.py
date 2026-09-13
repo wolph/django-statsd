@@ -286,3 +286,55 @@ def record_database_overhead(rounds: int = 300) -> str:
         )
         + '\n'
     )
+
+
+WIRE_PATH: Final[Path] = TRANSCRIPT_ROOT / 'wire.txt'
+
+#: Printed in front of each packet, matching examples/udp_listener.py.
+WIRE_PREFIX: Final[str] = 'udp :8125 <'
+
+
+def record_wire() -> str:
+    """Capture the real UDP datagrams one request puts on the wire.
+
+    Binds a socket, points django-statsd at it and serves one request, so
+    this is the bytes themselves rather than the payload dicts behind
+    them.
+    """
+    import socket
+    import threading
+
+    sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    sock.bind(('127.0.0.1', 0))
+    port = sock.getsockname()[1]
+    packets: list[str] = []
+
+    def listen() -> None:
+        while True:
+            try:
+                payload, _ = sock.recvfrom(8192)
+            except OSError:
+                return
+            packets.append(payload.decode())
+
+    listener = threading.Thread(target=listen, daemon=True)
+    listener.start()
+    try:
+        with demo_settings(STATSD_HOST='127.0.0.1', STATSD_PORT=port):
+            _get('/dashboard/')
+        listener.join(timeout=1.0)
+    finally:
+        sock.close()
+
+    lines = ['# GET /dashboard/, as seen by a UDP listener', '']
+    lines.extend(f'{WIRE_PREFIX} {packet}' for packet in sorted(packets))
+    return '\n'.join(lines) + '\n'
+
+
+def wire_names(text: str) -> tuple[str, ...]:
+    """Return the metric names in a wire transcript, without values."""
+    return tuple(
+        line.split()[-1].split(':', 1)[0]
+        for line in text.splitlines()
+        if line and not line.startswith('#')
+    )

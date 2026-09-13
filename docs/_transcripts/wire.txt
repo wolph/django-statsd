@@ -1,0 +1,10 @@
+# GET /dashboard/, as seen by a UDP listener
+
+udp :8125 < myproject.view.get.myproject.views.dashboard.hit:1|c
+udp :8125 < myproject.view.get.myproject.views.dashboard.process_request:0.01001358|ms
+udp :8125 < myproject.view.get.myproject.views.dashboard.process_response:0.09393692|ms
+udp :8125 < myproject.view.get.myproject.views.dashboard.process_view:0.00214577|ms
+udp :8125 < myproject.view.get.myproject.views.dashboard.total:0.15091896|ms
+udp :8125 < myproject.view.http_codes.2xx:1|c
+udp :8125 < myproject.view.http_codes.hit:1|c
+udp :8125 < myproject.view.site.hit:1|c

@@ -71,6 +71,9 @@ select = [
 # Tests and generators document themselves in comments, and their
 # helpers are not public API.
 'tests/**' = ['D100', 'D101', 'D102', 'D103', 'D104', 'D105', 'D107']
+# Standalone scripts a reader runs by hand: they print, and they are not
+# an importable package.
+'examples/*' = ['INP001', 'T201']
 'docs/generate/*' = [
     'INP001', 'RUF012', 'T201', 'ICN001', 'E402', 'PERF203',
     'D100', 'D101', 'D102', 'D103', 'D104', 'D105', 'D107',

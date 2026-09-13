@@ -125,6 +125,21 @@ Two transcripts hold real durations rather than only names:
 `payload.txt` and `chart_data.txt`. Durations change from run to run,
 so their tests check the metric names and leave the numbers alone.
 
+### The examples directory
+
+`examples/` holds the things the quickstart tells a reader to run: a UDP
+listener that prints every packet as it arrives, and a compose stack
+with statsd, Graphite and Grafana already wired together.
+
+`docs/generate/dashboard.py` drives that same compose file to record the
+README screenshot, so the picture and the stack a reader brings up are
+the same stack. Change the compose file and the screenshot changes with
+it, which is the point.
+
+The stack binds 18225, 18280 and 13200 rather than 8125, 8080 and 3000,
+because those are the ports another statsd or Grafana on the same
+machine already has.
+
 ### Regenerating the images
 
 ```bash

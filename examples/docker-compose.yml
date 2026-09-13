@@ -1,5 +1,9 @@
-# Brought up by docs/generate/dashboard.py to record the screenshot in
-# the README. Nothing here ships with django-statsd.
+# statsd, Graphite and Grafana, wired together and ready for a Django
+# project to point at. See docs/getting-started/quickstart.rst.
+#
+# docs/generate/dashboard.py drives this same stack to record the
+# screenshot in the README, so the picture and the thing you run are
+# the same thing.
 services:
   graphite:
     image: graphiteapp/graphite-statsd:1.1.10-5
@@ -23,4 +27,4 @@ services:
       GF_AUTH_DISABLE_LOGIN_FORM: 'true'
       GF_USERS_DEFAULT_THEME: dark
     volumes:
-      - ./provisioning:/etc/grafana/provisioning:ro
+      - ./grafana/provisioning:/etc/grafana/provisioning:ro

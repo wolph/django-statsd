@@ -48,6 +48,9 @@
 - The README carries a logo, six badges, a recording of metrics
   arriving, a timing breakdown chart and a Grafana screenshot, each one
   generated from real behaviour by a committed script.
+- A quickstart that goes from `pip install` to packets on the wire in a
+  minute, and to graphs in five, with `examples/` holding the UDP
+  listener and the compose stack it tells you to run.
 
 ## 2.7.0 and earlier
 

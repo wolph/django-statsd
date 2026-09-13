@@ -2,11 +2,11 @@
 
 myproject.view.http_codes.hit 1|c
 myproject.view.http_codes.2xx 1|c
-myproject.view.get.myproject.views.search.process_request 0.00882149|ms
-myproject.view.get.myproject.views.search.process_view 0.00166893|ms
-myproject.view.get.myproject.views.search.json.dumps 0.00476837|ms
-myproject.view.get.myproject.views.search.build_queryset 0.00596046|ms
-myproject.view.get.myproject.views.search.process_response 0.02717972|ms
-myproject.view.get.myproject.views.search.total 0.08583069|ms
+myproject.view.get.myproject.views.search.process_request 0.01096725|ms
+myproject.view.get.myproject.views.search.process_view 0.00309944|ms
+myproject.view.get.myproject.views.search.json.dumps 0.00596046|ms
+myproject.view.get.myproject.views.search.build_queryset 0.00905991|ms
+myproject.view.get.myproject.views.search.process_response 0.02908707|ms
+myproject.view.get.myproject.views.search.total 0.09489059|ms
 myproject.view.get.myproject.views.search.hit 1|c
 myproject.view.site.hit 1|c

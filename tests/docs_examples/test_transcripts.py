@@ -20,11 +20,14 @@ from ._metrics import (
     OVERHEAD_PATH,
     PAYLOAD_PATH,
     SCENARIOS,
+    WIRE_PATH,
     Scenario,
     payload_names,
     record_chart_data,
     record_database_overhead,
     record_payload,
+    record_wire,
+    wire_names,
 )
 
 REGENERATE = os.environ.get('DJANGO_STATSD_REGENERATE') == '1'
@@ -124,3 +127,23 @@ def test_database_overhead_is_recorded() -> None:
     assert 'STATSD_TRACK_DATABASE off' in body
     assert 'STATSD_TRACK_DATABASE on' in body
     assert 'overhead' in body
+
+
+@pytest.mark.django_db
+def test_wire_transcript_shows_real_packets() -> None:
+    """The quickstart quotes these bytes, so they have to be the bytes.
+
+    Durations differ per run, so the names are asserted and the numbers
+    are left alone.
+    """
+    if REGENERATE:
+        WIRE_PATH.write_text(record_wire(), encoding='utf-8')
+
+    assert WIRE_PATH.exists(), (
+        f'{WIRE_PATH} is missing. Regenerate with tox -e docs-assets'
+    )
+
+    committed = wire_names(WIRE_PATH.read_text(encoding='utf-8'))
+    assert set(committed) == set(wire_names(record_wire())), (
+        f'{WIRE_PATH} drifted. Regenerate with tox -e docs-assets'
+    )

@@ -24,7 +24,13 @@ from ._docs_examples import (
 EXPECTED_LANGUAGES = {
     'README.md': ('bash', 'python', 'python', 'python'),
     'docs/getting-started/installation.rst': ('bash',),
-    'docs/getting-started/quickstart.rst': ('python',),
+    'docs/getting-started/quickstart.rst': (
+        'bash',
+        'python',
+        'python',
+        'python',
+        'python',
+    ),
     'docs/measure/queries.rst': ('python',),
     'docs/measure/views.rst': ('python',),
     'docs/measure/your-own-code.rst': ('python', 'python'),
