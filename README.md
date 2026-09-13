@@ -8,6 +8,7 @@
   <a href="https://pypi.org/project/django-statsd/"><img src="https://img.shields.io/pypi/pyversions/django-statsd" alt="Python"></a>
   <a href="https://pypi.org/project/django-statsd/"><img src="https://img.shields.io/pypi/dm/django-statsd" alt="Downloads"></a>
   <a href="https://django-stats.readthedocs.io/en/latest/"><img src="https://readthedocs.org/projects/django-stats/badge/?version=latest" alt="Documentation"></a>
+  <a href="https://github.com/WoLpH/django-statsd/actions/workflows/ci.yml"><img src="https://img.shields.io/badge/coverage-100%25-brightgreen" alt="Coverage, enforced in CI"></a>
   <a href="https://github.com/WoLpH/django-statsd/blob/master/LICENSE"><img src="https://img.shields.io/pypi/l/django-statsd" alt="License"></a>
 </p>
 
