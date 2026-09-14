@@ -3,14 +3,14 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/wolph/django-statsd/actions/workflows/ci.yml?query=branch%3Amaster"><img src="https://github.com/wolph/django-statsd/actions/workflows/ci.yml/badge.svg?branch=master" alt="CI on master"></a>
-  <a href="https://pypi.org/project/django-statsd/"><img src="https://img.shields.io/pypi/v/django-statsd?style=plastic" alt="PyPI"></a>
-  <a href="https://pypi.org/project/django-statsd/"><img src="https://img.shields.io/pypi/pyversions/django-statsd?style=plastic" alt="Python"></a>
-  <a href="https://pepy.tech/projects/django-statsd"><img src="https://static.pepy.tech/badge/django-statsd/month" alt="Monthly downloads"></a>
-  <a href="https://django-stats.readthedocs.io/en/latest/"><img src="https://img.shields.io/readthedocs/django-stats/latest?style=plastic" alt="Documentation"></a>
+  <a href="https://github.com/wolph/django-statsd/actions/workflows/ci.yml?query=branch%3Amaster"><img src="https://img.shields.io/github/actions/workflow/status/wolph/django-statsd/ci.yml?branch=master&label=CI&style=flat-square&labelColor=555" alt="CI on master"></a>
+  <a href="https://pypi.org/project/django-statsd/"><img src="https://img.shields.io/pypi/v/django-statsd?style=flat-square&labelColor=555&color=007ec6" alt="PyPI"></a>
+  <a href="https://pypi.org/project/django-statsd/"><img src="https://img.shields.io/pypi/pyversions/django-statsd?style=flat-square&labelColor=555&color=007ec6" alt="Python"></a>
+  <a href="https://pepy.tech/projects/django-statsd"><img src="https://img.shields.io/badge/dynamic/xml?url=https%3A%2F%2Fapi.pepy.tech%2Fbadge%2Fdjango-statsd%2Fmonth&query=%28%2F%2F%2A%5Blocal-name%28%29%3D%22text%22%5D%29%5Blast%28%29%5D&label=downloads%2Fmonth&style=flat-square&labelColor=555&color=007ec6" alt="Monthly downloads"></a>
+  <a href="https://django-stats.readthedocs.io/en/latest/"><img src="https://img.shields.io/readthedocs/django-stats/latest?style=flat-square&labelColor=555" alt="Documentation"></a>
   <!-- Coveralls is case-sensitive on the owner: WoLpH serves an "unknown" badge. -->
-  <a href="https://coveralls.io/github/wolph/django-statsd?branch=master"><img src="https://coveralls.io/repos/github/wolph/django-statsd/badge.svg?branch=master" alt="Coverage on master"></a>
-  <a href="https://github.com/WoLpH/django-statsd/blob/master/LICENSE"><img src="https://img.shields.io/pypi/l/django-statsd?style=plastic" alt="License"></a>
+  <a href="https://coveralls.io/github/wolph/django-statsd?branch=master"><img src="https://img.shields.io/coverallsCoverage/github/wolph/django-statsd?branch=master&style=flat-square&labelColor=555" alt="Coverage on master"></a>
+  <a href="https://github.com/WoLpH/django-statsd/blob/master/LICENSE"><img src="https://img.shields.io/pypi/l/django-statsd?style=flat-square&labelColor=555&color=007ec6" alt="License"></a>
 </p>
 
 Two middleware entries, and every view, query, template and Celery task
