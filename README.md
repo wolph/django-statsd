@@ -4,13 +4,13 @@
 
 <p align="center">
   <a href="https://github.com/wolph/django-statsd/actions/workflows/ci.yml?query=branch%3Amaster"><img src="https://github.com/wolph/django-statsd/actions/workflows/ci.yml/badge.svg?branch=master" alt="CI on master"></a>
-  <a href="https://pypi.org/project/django-statsd/"><img src="https://img.shields.io/pypi/v/django-statsd" alt="PyPI"></a>
-  <a href="https://pypi.org/project/django-statsd/"><img src="https://img.shields.io/pypi/pyversions/django-statsd" alt="Python"></a>
-  <a href="https://pypi.org/project/django-statsd/"><img src="https://img.shields.io/pypi/dm/django-statsd" alt="Downloads"></a>
-  <a href="https://django-stats.readthedocs.io/en/latest/"><img src="https://readthedocs.org/projects/django-stats/badge/?version=latest" alt="Documentation"></a>
+  <a href="https://pypi.org/project/django-statsd/"><img src="https://img.shields.io/pypi/v/django-statsd?style=plastic" alt="PyPI"></a>
+  <a href="https://pypi.org/project/django-statsd/"><img src="https://img.shields.io/pypi/pyversions/django-statsd?style=plastic" alt="Python"></a>
+  <a href="https://pepy.tech/projects/django-statsd"><img src="https://static.pepy.tech/badge/django-statsd/month" alt="Monthly downloads"></a>
+  <a href="https://django-stats.readthedocs.io/en/latest/"><img src="https://img.shields.io/readthedocs/django-stats/latest?style=plastic" alt="Documentation"></a>
   <!-- Coveralls is case-sensitive on the owner: WoLpH serves an "unknown" badge. -->
   <a href="https://coveralls.io/github/wolph/django-statsd?branch=master"><img src="https://coveralls.io/repos/github/wolph/django-statsd/badge.svg?branch=master" alt="Coverage on master"></a>
-  <a href="https://github.com/WoLpH/django-statsd/blob/master/LICENSE"><img src="https://img.shields.io/pypi/l/django-statsd" alt="License"></a>
+  <a href="https://github.com/WoLpH/django-statsd/blob/master/LICENSE"><img src="https://img.shields.io/pypi/l/django-statsd?style=plastic" alt="License"></a>
 </p>
 
 Two middleware entries, and every view, query, template and Celery task
