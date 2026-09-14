@@ -69,7 +69,7 @@ jobs:
       - name: Combine coverage and check threshold
         run: tox -e coverage
       - name: Report to Coveralls
-        uses: coverallsapp/github-action@v2
+        uses: coverallsapp/github-action@8d6379e14d29928660c4ba802d8e85393440b329 # v2.3.8
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           file: coverage.lcov
