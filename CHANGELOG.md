@@ -1,5 +1,26 @@
 # Changelog
 
+## 3.0.1 (2026-10-28)
+
+### Fixed
+
+- The source distribution builds with every `uv_build` release up to 1.0
+  instead of refusing anything from 0.13 on. The upper bound only ever
+  stopped other build frontends such as `python -m build` and distro
+  packagers, who then needed a new release before they could build
+  (asked for in portalocker by @jeremycline in PR #155).
+
+### Internal
+
+- The development lock file moves to patched releases of uv, virtualenv,
+  filelock, Pillow, urllib3, certifi and Django. The 14-day resolver
+  shield stays on, with a dated per-package exception for each of these
+  fixes. The Python 3.10 resolution keeps filelock 4.1 and Pillow 12.3,
+  because their patched releases need Python 3.11.
+- The quickstart, the Grafana examples and the coverage reporting
+  landed on develop after 3.0.0 and ship with this release. No code
+  under `django_statsd` changed.
+
 ## 3.0.0 (2026-09-12)
 
 ### Breaking changes

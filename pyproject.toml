@@ -1,10 +1,10 @@
 [build-system]
-requires = ["uv_build>=0.11.0,<0.13"]
+requires = ["uv_build>=0.11.0,<1"]
 build-backend = "uv_build"
 
 [project]
 name = "django-statsd"
-version = "3.0.0"
+version = "3.0.1"
 description = "Django app that submits query and view durations to statsd."
 readme = "README.md"
 license = "BSD-3-Clause"
@@ -139,3 +139,7 @@ ignore-missing-imports = ["statsd", "celery", "celery.*"]
 
 [tool.uv]
 exclude-newer = "14 days"
+# Security fixes pulled through the 14-day shield on purpose, each dated
+# the day after its patched release. Drop an entry once that release is
+# older than 14 days and relock.
+exclude-newer-package = { uv = "2026-10-21", virtualenv = "2026-10-18", filelock = "2026-10-18", pillow = "2026-10-17", certifi = "2026-10-21" }
